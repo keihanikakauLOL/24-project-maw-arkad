@@ -15,8 +15,10 @@ class buttonBuild{
         float FontSize;
         float buttonSize_x;
         float buttonSize_y;
-        float X,Y;
+        float X;
+        float Y;
         string name;
+        sf::Color ColorBox;
         sf::RectangleShape builtButton(); 
         sf::Text txtBox(sf::Vector2f);
 };
@@ -41,7 +43,7 @@ sf::RectangleShape buttonBuild::builtButton(){
     sf::RectangleShape button({buttonSize_x,buttonSize_y}); //Create button variable with size
     button.setOrigin(button.getGeometricCenter());
     button.setPosition({posBox_x,posBox_y}); 
-    button.setFillColor(sf::Color::Blue);
+    button.setFillColor(sf::Color(255,0,0,0));
     return button;
 };
 

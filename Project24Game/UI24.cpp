@@ -17,7 +17,8 @@ int main()
         .buttonSize_y = 100,
         .X = 5,
         .Y = 0,
-        .name = "Game24"
+        .name = "Game24",
+        .ColorBox = sf::Color(255,0,0)
     };
 
     // buttonN
@@ -29,7 +30,8 @@ int main()
         .buttonSize_y = 100,
         .X = 5,
         .Y = 0,
-        .name = "Random"
+        .name = "Random",
+        .ColorBox = sf::Color(0,250,0)
     };
     
     sf:: RectangleShape button_24 = button24.builtButton();
@@ -47,13 +49,13 @@ int main()
         {
             button_24.setFillColor(sf::Color(0,75,22)); // we can create animated or click to process
         }else{
-            button_24.setFillColor(sf::Color::Blue); // reset went not set
+            button_24.setFillColor(button24.ColorBox); // reset went not set
         }
         if (button_N.getGlobalBounds().contains(mouse_pos)) // check button is coline with mouse : augmentNeedtoCheck.getGlobalBound().contains(whatIscheckwith); >> getGlobalBound() = check coline
         {
             button_N.setFillColor(sf::Color(0,75,22)); // we can create animated or click to process
         }else{
-            button_N.setFillColor(sf::Color::Red); // reset went not set
+            button_N.setFillColor(buttonN.ColorBox); // reset went not set
         }
 
         
