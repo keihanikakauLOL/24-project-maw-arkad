@@ -43,7 +43,7 @@ sf::RectangleShape buttonBuild::builtButton(){
     sf::RectangleShape button({buttonSize_x,buttonSize_y}); //Create button variable with size
     button.setOrigin(button.getGeometricCenter());
     button.setPosition({posBox_x,posBox_y}); 
-    button.setFillColor(sf::Color(255,0,0,0));
+    button.setFillColor(ColorBox);
     return button;
 };
 
