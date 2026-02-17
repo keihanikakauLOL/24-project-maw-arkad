@@ -10,31 +10,32 @@ int main()
 
     // button24
     buttonBuild button24 = {
-        .posBox_x = windowSize_x/6,
+        .posBox_x = windowSize_x*1/5,
         .posBox_y = WindowSize_y/(float)2, // 2.5 when no float was assian as double type
         .FontSize = 75,
-        .buttonSize_x = 225,
-        .buttonSize_y = 75,
-        .shiftX = -110,
-        .shiftY = -50,
-        .name = "--Game24--"
+        .buttonSize_x = 300,
+        .buttonSize_y = 100,
+        .X = 5,
+        .Y = 0,
+        .name = "Game24"
     };
 
     // buttonN
     buttonBuild buttonN = {
-        .posBox_x = windowSize_x*4/6,
+        .posBox_x = windowSize_x*4/5,
         .posBox_y = WindowSize_y/(float)2, // 2.5 when no float was assian as double type
         .FontSize = 75,
-        .buttonSize_x = 225,
-        .buttonSize_y = 75,
-        .shiftX = -110,
-        .shiftY = -50,
+        .buttonSize_x = 300,
+        .buttonSize_y = 100,
+        .X = 5,
+        .Y = 0,
         .name = "Random"
     };
-
+    
     sf:: RectangleShape button_24 = button24.builtButton();
     sf:: RectangleShape button_N = buttonN.builtButton();
     
+    // GameOn
     while (window.isOpen()) // using to make window always open 
     {
         while (const std::optional event = window.pollEvent()) // Closing windows functions
@@ -61,8 +62,10 @@ int main()
         window.draw(tilte.TitleName());
         window.draw(button_24);
         window.draw(button_N);
-        window.draw(button24.txtBox());
-        window.draw(buttonN.txtBox());    
+        window.draw(button24.txtBox(button24.builtButton().getGeometricCenter()));
+        window.draw(buttonN.txtBox(buttonN.builtButton().getGeometricCenter()));    
+
+
         
         // end the current frame
         window.display();
