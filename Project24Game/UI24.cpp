@@ -42,7 +42,17 @@ int main()
     bool isOver_N = false;
     bool isClicked_24 = false;
     bool isClicked_N = false;
+
+    enum GameState { // state of game to process more easily
+    MENU,
+    GAME24,
+    RANDOM_MODE
+};
+
+GameState state = MENU;
     
+
+
     // GameOn
     while (window.isOpen()) // using to make window always open 
     {
@@ -79,26 +89,32 @@ int main()
 
         //------------------------------------------------------------------
         if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) // clicked 
-        {
-            if(isOver_24){ // clicked happen on button_24 or not 
-                isClicked_24 = true;
-            }
+        {   
+            if (state == MENU) // only process when in menu state
+            {
+                if(isOver_24){ // clicked happen on button_24 or not 
+                    isClicked_24 = true;
+                    state = GAME24;
+                }
 
-            else if(isOver_N){ // clicked happen on button_N or not
-                isClicked_N = true;
+                else if(isOver_N){ // clicked happen on button_N or not
+                    isClicked_N = true;
+                    state = RANDOM_MODE;
+                }
             }
             
         }
-        if(isClicked_24) 
+        if(state == GAME24) 
         {
             window.clear(sf::Color::Black); // Start GAME24
+           
         }
 
-        else if(isClicked_N)
+        else if(state == RANDOM_MODE)
         {
             window.clear(sf::Color::Red); // Start RANDOM mode
         }
-    
+       
         // end the current frame
         window.display();
     }
