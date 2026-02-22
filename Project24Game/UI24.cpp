@@ -84,7 +84,7 @@ int main()
                 isClicked_24 = true;
             }
 
-            if(isOver_N){ // clicked happen on button_N or not
+            else if(isOver_N){ // clicked happen on button_N or not
                 isClicked_N = true;
             }
             
@@ -94,7 +94,7 @@ int main()
             window.clear(sf::Color::Black); // Start GAME24
         }
 
-        if(isClicked_N)
+        else if(isClicked_N)
         {
             window.clear(sf::Color::Red); // Start RANDOM mode
         }
