@@ -40,8 +40,7 @@ int main()
     // for check mouse is over button or not and click button or not so we process more easily
     bool isOver_24 = false;
     bool isOver_N = false;
-    bool isClicked_24 = false;
-    bool isClicked_N = false;
+    
 
     enum GameState { // state of game to process more easily
     MENU,
@@ -93,12 +92,10 @@ GameState state = MENU;
             if (state == MENU) // only process when in menu state
             {
                 if(isOver_24){ // clicked happen on button_24 or not 
-                    isClicked_24 = true;
                     state = GAME24;
                 }
 
                 else if(isOver_N){ // clicked happen on button_N or not
-                    isClicked_N = true;
                     state = RANDOM_MODE;
                 }
             }
