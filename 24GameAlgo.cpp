@@ -103,7 +103,7 @@ bool Solve24game(double problem[]) {
 
 int main() {
     //test case
-    double arr1[4] = {1,2,3,4};
+    double arr1[4] = {6,4,7,9};
 
     if (!Solve24game(arr1)) {
         cout << "This problem is not solvable" << endl;
