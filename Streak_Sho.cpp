@@ -1,6 +1,10 @@
 #include <iostream>
+#include <map>
+#include <string>
+#include <iomanip>
+#include <vector>
+#include <algorithm>
 using namespace std;
-
 void StreakTrack(bool ans){
     const int base_score = 5;
     const int streak_base = 3;
@@ -32,7 +36,94 @@ void StreakTrack(bool ans){
         cout << "Total score: " << tolscore << endl;
     }
 }
-
+struct User{
+    string name;
+    double bestTime;        //เวลา มาก/น้อย สุดที่ Userใช้ภายใน 1 ด่าน ตอนนี้เป็นมากสุด ถ้าอยากแก้ก็แก้ได้
+    int highestScore;
+    int highestStreak;
+    User() : name(""), bestTime(0.0), highestScore(0), highestStreak(0) {}
+    User(string n, double t, int score, int streak) 
+        : name(n), bestTime(t), highestScore(score), highestStreak(streak) {}
+};
+class Scoreboard {
+private:
+    map<string, User> players; // key = player name, value = their data
+public:
+    // เพิ่ม Player ใหม่ หรือ อัพเดท คนเดิม
+    void addOrUpdatePlayer(string name, double time, int score, int streak) {
+        if (players.find(name) != players.end()) {
+            User& player = players[name];
+            
+            if (time > player.bestTime) {
+                player.bestTime = time;
+            }
+            if (score > player.highestScore) {
+                player.highestScore = score;
+            }
+            if (streak > player.highestStreak) {
+                player.highestStreak = streak;
+            }
+        } else {
+            //เพิ่ม Player ใหม่
+            players[name] = User(name, time, score, streak);
+        }
+    }
+    // แสดงผล Player ทุกคน
+    void displayAll() {
+        cout << "\n========== SCOREBOARD ==========" << endl;
+        cout << left << setw(15) << "Name" 
+             << setw(12) << "Best Time" 
+             << setw(15) << "High Score" 
+             << setw(15) << "High Streak" << endl;
+        cout << "======================================" << endl;
+        
+        for (auto& pair : players) {
+            User& p = pair.second;
+            cout << left << setw(15) << p.name 
+                 << setw(12) << fixed << setprecision(2) << p.bestTime 
+                 << setw(15) << p.highestScore 
+                 << setw(15) << p.highestStreak << endl;
+        }
+        cout << "======================================\n" << endl;
+    }
+    
+    void displayScores(int n = 5) {
+        cout << "\n===== TOP " << n << " HIGH SCORES =====" << endl;
+        
+        // Copy to vector for sorting
+        vector<User> sortedPlayers;
+        for (auto& pair : players) {
+            sortedPlayers.push_back(pair.second);
+        }
+        
+        // Sort by highest score (descending)
+        sort(sortedPlayers.begin(), sortedPlayers.end(), 
+             [](const User& a, const User& b) {
+                 return a.highestScore > b.highestScore;
+             });
+        
+        // Display top N
+        int count = min(n, (int)sortedPlayers.size());
+        for (int i = 0; i < count; i++) {
+            cout << i+1 << ". " << sortedPlayers[i].name 
+                 << " - " << sortedPlayers[i].highestScore << " pts" << endl;
+        }
+        cout << "============================\n" << endl;
+    }
+    
+    // Get specific player data
+    User* getPlayer(string name) {
+        if (players.find(name) != players.end()) {
+            return &players[name];
+        }
+        return nullptr;
+    }
+    
+    // Check if player exists
+    bool playerExists(string name) {
+        return players.find(name) != players.end();
+    }
+};
 int main() {
 
     bool ans = true; 
