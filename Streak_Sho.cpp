@@ -131,7 +131,7 @@ Scoreboard board;
     board.addOrUpdatePlayer("Eric", 52.3, 980, 5);
     board.addOrUpdatePlayer("Stan", 38.7, 1500, 12);
     
-    // Update Alice with better score
+    // Update Kyle with better score
     board.addOrUpdatePlayer("Kyle", 50.0, 1800, 10);
     
     // Display all players
@@ -147,3 +147,4 @@ Scoreboard board;
     }
 
 }
+
