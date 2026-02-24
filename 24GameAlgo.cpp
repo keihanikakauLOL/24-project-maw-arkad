@@ -9,7 +9,7 @@ const double verysmall = 1e-9;
 bool Check(double problem[], string expression[], int n) {
     if(n == 1) {
         if (abs(problem[0] - 24) < verysmall) {
-            cout << "Solution: " << expression[0] << " = 24" << endl;
+            cout << "Solution: " << expression[0] << " = 24" <<endl;
             return true;
         }
         else {
@@ -103,7 +103,7 @@ bool Solve24game(double problem[]) {
 
 int main() {
     //test case
-    double arr1[4] = {1,2,3,4};
+    double arr1[4] = {0,1,9,2};
 
     if (!Solve24game(arr1)) {
         cout << "This problem is not solvable" << endl;
