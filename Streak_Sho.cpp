@@ -90,13 +90,13 @@ public:
     void displayScores(int n = 5) {
         cout << "\n===== TOP " << n << " HIGH SCORES =====" << endl;
         
-        // Copy to vector for sorting
+        // ดึงจาก Vector มาเรียง
         vector<User> sortedPlayers;
         for (auto& pair : players) {
             sortedPlayers.push_back(pair.second);
         }
         
-        // Sort by highest score (descending)
+        // เรียงคะแนนสูงไปต่ำ
         sort(sortedPlayers.begin(), sortedPlayers.end(), 
              [](const User& a, const User& b) {
                  return a.highestScore > b.highestScore;
@@ -111,7 +111,7 @@ public:
         cout << "============================\n" << endl;
     }
     
-    // Get specific player data
+    // ดึงข้อมูลของ Player
     User* getPlayer(string name) {
         if (players.find(name) != players.end()) {
             return &players[name];
@@ -119,22 +119,31 @@ public:
         return nullptr;
     }
     
-    // Check if player exists
+    // เช็คถ้าเกิดไม่มี Player ชื่อนั้นๆ
     bool playerExists(string name) {
         return players.find(name) != players.end();
     }
 };
 int main() {
 
-    bool ans = true; 
-    for(int i =0;i<8;i++){
-    StreakTrack(true);   
-
+Scoreboard board;
+    board.addOrUpdatePlayer("Kyle", 45.5, 1200, 8);
+    board.addOrUpdatePlayer("Eric", 52.3, 980, 5);
+    board.addOrUpdatePlayer("Stan", 38.7, 1500, 12);
+    
+    // Update Alice with better score
+    board.addOrUpdatePlayer("Kyle", 50.0, 1800, 10);
+    
+    // Display all players
+    board.displayAll();
+    
+    // Display top 3
+    board.displayScores(3);
+    
+    // Get specific player
+    User* player = board.getPlayer("Stan");
+    if (player) {
+        cout << "Stan's best time: " << player->bestTime << " seconds" << endl;
     }
-    StreakTrack(true);   
-    StreakTrack(true);   
-    StreakTrack(true);  
-    StreakTrack(true);  
-    StreakTrack(true);   
-    StreakTrack(false);
+
 }
