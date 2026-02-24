@@ -15,29 +15,24 @@ atomic<int> difficulty(1);
 atomic<int> scoremax(0);
 atomic<bool> runaway(true);
 atomic<bool> restart(false);
-atomic<bool> timeout(true);
+atomic<bool> timeout(false);
 
 void timer_mode_normal() {
 
-    while (runaway) {
+    while(runaway){
+    if (running && timeLeft > 0) {
 
-        while (running && timeLeft > 0) {
+        cout << "\nTime Left: " << timeLeft << " sec" << flush;
+        this_thread::sleep_for(chrono::seconds(1));
+        timeLeft--;
 
-            cout << "\rTime Left: " << timeLeft << " sec" << flush;
-            this_thread::sleep_for(chrono::seconds(1));
-
-            timeLeft--;
+        if (timeLeft == 0) {
+            timeout = true;
         }
-
-        if (timeout) {
-            cout << "\nTime's up!\n";
-            timeout = false;
-            running = false;
-            streak = 0;
-        }
-
-        this_thread::sleep_for(chrono::milliseconds(50));
     }
+
+    this_thread::sleep_for(chrono::milliseconds(50));
+}
 }
 
 
@@ -85,12 +80,25 @@ void game_start() {
     }
 }
 
+void end_game(){
+    while (runaway){
+        while(running){
+            if (timeout){
+                cout << "\nTime's up!\n";
+                timeout = false;
+                running = false;
+                streak = 0;
+            }
+        }
+    }  
+}
 
 int main() {
 
     thread t1(timer_mode_normal);
     thread t2(point_mode_normal);
     thread t3(game_start);
+    thread t4(end_game);
 
     string cmd;
 
@@ -100,6 +108,8 @@ int main() {
 
         if (cmd == "correct") {
             answeredCorrect = true;
+            running = true;
+            timeLeft = 10;
         }
         else if (cmd == "restart") {
             restart = true;
@@ -114,6 +124,7 @@ int main() {
     t1.join();
     t2.join();
     t3.join();
+    t4.join();
 
     cout << "\nFinal Score: " << score << endl;
 
