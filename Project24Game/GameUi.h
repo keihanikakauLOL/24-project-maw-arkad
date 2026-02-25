@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -86,20 +87,30 @@ sf::RectangleShape Screen::BoxScreen(){
     return Box;
 }
 
-sf::RectangleShape Bar_Chart(double data[]){
-     sf::RectangleShape bar;
-    double data_n = sizeof(data) / sizeof(data[0]);
-    double data_max = *std::max_element(data, data + data_n);
-        bar.setOrigin({size/2, 0.f});
-        bar.setScale({1.f, -1.f}); // flip around Origin
-        bar.setFillColor(sf::Color(128,128,128));
-        for (int i = 0; i < data_n; i++)
-        {
-            bar.setSize({size, data[i]*scale});
-            bar.setPosition({(i + 0.5f) * space, window_h});
-            window.draw(bar);
-        } 
-    return bar;
+void Bar_Chart(sf::RenderWindow& window, int data[], int data_n)
+{
+    
+    int data_max = *max_element(data, data + data_n);
+    // size of window
+        float window_w = static_cast<float>(window.getSize().x);
+        float window_h = static_cast<float>(window.getSize().y);
+    //parameter
+        float space = window_w / data_n;
+        float size = 0.6f * space;
+        float scale = 0.9f * window_h / data_max;
+
+
+    sf::RectangleShape bar;
+    bar.setOrigin({size/2.f, 0.f});
+    bar.setScale({1.f, -1.f});
+    bar.setFillColor(sf::Color(128,128,128));
+
+    for (int i = 0; i < data_n; i++)
+    {
+        bar.setSize({size, data[i] * scale});
+        bar.setPosition({(i + 0.5f) * space, window_h});
+        window.draw(bar);
+    }
 }
 
 

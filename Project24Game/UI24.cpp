@@ -1,6 +1,7 @@
 #include "GameUi.h"
 
 void GameSystem24(string);
+void ScoreBoard(int[]);
 void Menu();
 
 sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name'
@@ -20,7 +21,7 @@ int main()
     {
         if (state == MENU){Menu();}
         if (state == GAME24){GameSystem24("1234");}
-        if (state == SCORE_BOARD){}
+        if (state == SCORE_BOARD){ScoreBoard(new int[4]{10, 20, 30, 40});}
     }
     
 }
@@ -55,13 +56,29 @@ void Menu(){
         .name = "Random",
         .ColorBox = sf::Color(0,250,0)
     };
+
+    // buttonN
+    buttonBuild buttonScore = buttonBuild{
+        .posBox_x = windowSize_x*0.5f,
+        .posBox_y = WindowSize_y*0.75f, // 2.5 when no float was assian as double type
+        .FontSize = 50,
+        .buttonSize_x = 150,
+        .buttonSize_y = 75,
+        .X = 5,
+        .Y = 0,
+        .name = "Score",
+        .ColorBox = sf::Color(0,250,0)
+    };
     
     sf:: RectangleShape button_24 = button24.builtButton();
     sf:: RectangleShape button_N = buttonN.builtButton();
+    sf:: RectangleShape button_Score = buttonScore.builtButton();
+
 
     // for check mouse is over button or not and click button or not so we process more easily
     bool isOver_24 = false;
     bool isOver_N = false;
+    bool isOver_Score = false;
     
     
     // GameOn
@@ -88,19 +105,31 @@ void Menu(){
                 button_N.setFillColor(buttonN.ColorBox); // reset went not set
                 isOver_N = false;
             }
-
+            if (button_Score.getGlobalBounds().contains(mouse_pos)) // check button is coline with mouse : augmentNeedtoCheck.getGlobalBound().contains(whatIscheckwith); >> getGlobalBound() = check coline
+            {
+                button_Score.setFillColor(sf::Color(0,75,22)); // we can create animated or click to process
+                isOver_Score = true;
+            }else{
+                button_Score.setFillColor(buttonScore.ColorBox); // reset went not set
+                isOver_Score = false;
+            }
             if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) // clicked 
             {   
                 if(isOver_24){ // clicked happen on button_24 or not 
                     state = GAME24;
+                }
+                if(isOver_Score){
+                    state = SCORE_BOARD;
                 }
             } 
             // windown.draw is order by line to line upper = under
             window.draw(tilte.TitleName());
             window.draw(button_24);
             window.draw(button_N);
+            window.draw(button_Score);
             window.draw(button24.txtBox(button24.builtButton().getGeometricCenter()));
             window.draw(buttonN.txtBox(buttonN.builtButton().getGeometricCenter())); 
+            window.draw(buttonScore.txtBox(buttonScore.builtButton().getGeometricCenter()));
             window.display(); 
         }    
     }  
@@ -217,23 +246,23 @@ void GameSystem24(string setNumber){
     }   
 }
 
-void ScoreBoard(double data[]){
+void ScoreBoard(int data[]){
     Screen Display;
     buttonBuild Back_Button = {
-        .posBox_x = windowSize_x*25/100,
-        .posBox_y = WindowSize_y*50/100, // 2.5 when no float was assian as double type
+        .posBox_x = windowSize_x*0,
+        .posBox_y = WindowSize_y*0, // 2.5 when no float was assian as double type
         .FontSize = 75,
         .buttonSize_x = 150,
         .buttonSize_y = 150,
         .X = 0,
         .Y = 0,
         .name = "Back",
-            .ColorBox = sf::Color(255,20,52)
+            .ColorBox = sf::Color::White
         };
     sf::RectangleShape Back_Button_Rect = Back_Button.builtButton();
-        while (GameState == SCORE_BOARD){
-            Bar_Chart(data);
+        while (state == SCORE_BOARD){
             window.clear();
+            Bar_Chart(window, data, 4);
             window.draw(Back_Button_Rect);
            
             while (const std::optional event = window.pollEvent()) // Closing windows functions
@@ -252,3 +281,4 @@ void ScoreBoard(double data[]){
             }
              window.display();
         }
+}
