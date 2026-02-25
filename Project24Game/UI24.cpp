@@ -8,7 +8,8 @@ sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window var
 enum GameState { // state of game to process more easily
     MENU,
     GAME24,
-    RANDOM_MODE
+    RANDOM_MODE,
+    SCORE_BOARD
 };
 GameState state = MENU;
 
@@ -19,6 +20,7 @@ int main()
     {
         if (state == MENU){Menu();}
         if (state == GAME24){GameSystem24("1234");}
+        if (state == SCORE_BOARD){}
     }
     
 }
@@ -214,3 +216,39 @@ void GameSystem24(string setNumber){
         window.display();
     }   
 }
+
+void ScoreBoard(double data[]){
+    Screen Display;
+    buttonBuild Back_Button = {
+        .posBox_x = windowSize_x*25/100,
+        .posBox_y = WindowSize_y*50/100, // 2.5 when no float was assian as double type
+        .FontSize = 75,
+        .buttonSize_x = 150,
+        .buttonSize_y = 150,
+        .X = 0,
+        .Y = 0,
+        .name = "Back",
+            .ColorBox = sf::Color(255,20,52)
+        };
+    sf::RectangleShape Back_Button_Rect = Back_Button.builtButton();
+        while (GameState == SCORE_BOARD){
+            Bar_Chart(data);
+            window.clear();
+            window.draw(Back_Button_Rect);
+           
+            while (const std::optional event = window.pollEvent()) // Closing windows functions
+            {
+                if (event->is<sf::Event::Closed>()) window.close();
+                auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
+                if (Back_Button_Rect.getGlobalBounds().contains(mouse_pos)) 
+                {
+                    Back_Button_Rect.setFillColor(sf::Color(44,75,22)); 
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        state = MENU;
+                    }
+                }else{
+                    Back_Button_Rect.setFillColor(Back_Button.ColorBox); 
+                }
+            }
+             window.display();
+        }

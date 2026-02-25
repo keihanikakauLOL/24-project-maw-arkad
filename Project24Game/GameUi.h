@@ -86,6 +86,21 @@ sf::RectangleShape Screen::BoxScreen(){
     return Box;
 }
 
+sf::RectangleShape Bar_Chart(double data[]){
+     sf::RectangleShape bar;
+    double data_n = sizeof(data) / sizeof(data[0]);
+    double data_max = *std::max_element(data, data + data_n);
+        bar.setOrigin({size/2, 0.f});
+        bar.setScale({1.f, -1.f}); // flip around Origin
+        bar.setFillColor(sf::Color(128,128,128));
+        for (int i = 0; i < data_n; i++)
+        {
+            bar.setSize({size, data[i]*scale});
+            bar.setPosition({(i + 0.5f) * space, window_h});
+            window.draw(bar);
+        } 
+    return bar;
+}
 
 
 
