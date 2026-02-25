@@ -273,6 +273,7 @@ void ScoreBoard(int data[]){
                 {
                     Back_Button_Rect.setFillColor(sf::Color(44,75,22)); 
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        window.clear();
                         state = MENU;
                     }
                 }else{
