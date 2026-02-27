@@ -65,7 +65,13 @@ class Screen{
         void add(char);
         sf::Text printData();
         sf::RectangleShape BoxScreen();
+        string Get_Data();
+        void pop();
 };
+
+void Screen::pop(){
+    strData.pop_back();
+}
 
 void Screen::add(char inputNumber){
     strData+=inputNumber;
@@ -85,6 +91,10 @@ sf::RectangleShape Screen::BoxScreen(){
     Box.setOrigin(Box.getGeometricCenter());
     Box.setFillColor(sf::Color(128,128,128));
     return Box;
+}
+
+string Screen::Get_Data(){
+    return strData;
 }
 
 void Bar_Chart(sf::RenderWindow& window, int data[], int data_n)

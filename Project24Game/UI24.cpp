@@ -28,7 +28,6 @@ int main()
 
 void Menu(){
     // Build Windows Frame
-    
     Title tilte;
 
     // button24
@@ -137,7 +136,8 @@ void Menu(){
 
 void GameSystem24(string setNumber){
     Screen Display;
-    bool gateway[] = {0,0,0,0};
+    bool gateway[] = {0,0,0,0,0,0,0,0};
+    bool hasDel = 0;
     buttonBuild number1 = {
         .posBox_x = windowSize_x*25/100,
         .posBox_y = WindowSize_y*50/100, // 2.5 when no float was assian as double type
@@ -182,66 +182,205 @@ void GameSystem24(string setNumber){
             .name = to_string(setNumber[3]-48),
             .ColorBox = sf::Color(255,20,52)
         };
+    buttonBuild plus = {
+            .posBox_x = windowSize_x*75/100,
+            .posBox_y = WindowSize_y*40/100, // 2.5 when no float was assian as double type
+            .FontSize = 50,
+            .buttonSize_x = 100,
+            .buttonSize_y = 100,
+            .X = 0,
+            .Y = 0,
+            .name = "+",
+            .ColorBox = sf::Color(255,20,52)
+        };
+    buttonBuild minu = {
+            .posBox_x = windowSize_x*75/100,
+            .posBox_y = WindowSize_y*55/100, // 2.5 when no float was assian as double type
+            .FontSize = 50,
+            .buttonSize_x = 100,
+            .buttonSize_y = 100,
+            .X = 0,
+            .Y = 0,
+            .name = "-",
+            .ColorBox = sf::Color(255,20,52)
+        };
+    buttonBuild mul = {
+            .posBox_x = windowSize_x*75/100,
+            .posBox_y = WindowSize_y*70/100, // 2.5 when no float was assian as double type
+            .FontSize = 50,
+            .buttonSize_x = 100,
+            .buttonSize_y = 100,
+            .X = 0,
+            .Y = 0,
+            .name = "x",
+            .ColorBox = sf::Color(255,20,52)
+        };
+    buttonBuild div = {
+            .posBox_x = windowSize_x*75/100,
+            .posBox_y = WindowSize_y*85/100, // 2.5 when no float was assian as double type
+            .FontSize = 50,
+            .buttonSize_x = 100,
+            .buttonSize_y = 100,
+            .X = 0,
+            .Y = 0,
+            .name = "/",
+            .ColorBox = sf::Color(255,20,52)
+        };
+    buttonBuild del = {
+            .posBox_x = windowSize_x*90/100,
+            .posBox_y = WindowSize_y*35/100, // 2.5 when no float was assian as double type
+            .FontSize = 25,
+            .buttonSize_x = 50,
+            .buttonSize_y = 50,
+            .X = 0,
+            .Y = 0,
+            .name = "BS",
+            .ColorBox = sf::Color(255,20,52)
+        };   
+    buttonBuild GetBack = {
+            .posBox_x = 25,
+            .posBox_y = 25, // 2.5 when no float was assian as double type
+            .FontSize = 75,
+            .buttonSize_x = 50,
+            .buttonSize_y = 50,
+            .X = 0,
+            .Y = 0,
+            .name = "Icon",
+            .ColorBox = sf::Color(255,20,52)
+        };
     sf::RectangleShape number_1 = number1.builtButton();
     sf::RectangleShape number_2 = number2.builtButton();
     sf::RectangleShape number_3 = number3.builtButton();
     sf::RectangleShape number_4 = number4.builtButton();
+    sf::RectangleShape Plus = plus.builtButton();
+    sf::RectangleShape Minu = minu.builtButton();
+    sf::RectangleShape Mul = mul.builtButton();
+    sf::RectangleShape Div = div.builtButton();
+    sf::RectangleShape Get_Back = GetBack.builtButton();
+    sf::RectangleShape dele = del.builtButton();
     while (state == GAME24){
         window.clear(); 
         window.draw(number_1);
         window.draw(number1.txtBox(number_1.getPosition()));
+        //
         window.draw(number_2);
         window.draw(number2.txtBox(number_2.getPosition()));
+        //
         window.draw(number_3);
         window.draw(number3.txtBox(number_3.getPosition()));
+        //
         window.draw(number_4);
         window.draw(number4.txtBox(number_4.getPosition()));
-        while (const std::optional event = window.pollEvent()) // Closing windows functions
-        {
-            if (event->is<sf::Event::Closed>()) window.close();
-            auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
-            if (number_1.getGlobalBounds().contains(mouse_pos)) 
-            {
-                number_1.setFillColor(sf::Color(44,75,22)); 
-                if (gateway[0] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                    gateway[0] = 1;
-                    Display.add(setNumber[0]);
-                }
-            }else{
-                number_1.setFillColor(number1.ColorBox); 
-            }
-            if (number_2.getGlobalBounds().contains(mouse_pos))
-            {
-                number_2.setFillColor(sf::Color(44,75,22)); 
-                if (gateway[1] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                    gateway[1] = 1;
-                    Display.add(setNumber[1]);
-                }
-            }else{
-                number_2.setFillColor(number2.ColorBox);
-            }
-            if (number_3.getGlobalBounds().contains(mouse_pos)) 
-            {
-                number_3.setFillColor(sf::Color(44,75,22)); 
-                if (gateway[2] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                    gateway[2] = 1;
-                    Display.add(setNumber[2]);
-                }
-            }else{
-                number_3.setFillColor(number3.ColorBox); 
-            }
-            if (number_4.getGlobalBounds().contains(mouse_pos)){
-                number_4.setFillColor(sf::Color(44,75,22));
-                if (gateway[3] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                    gateway[3] = 1;
-                    Display.add(setNumber[3]);
-                }
-            }else{
-                number_4.setFillColor(number4.ColorBox); 
-            }
-        }
+        //
+        window.draw(Get_Back);
+        window.draw(GetBack.txtBox(Get_Back.getPosition()));
+        //
+        window.draw(dele);
+        window.draw(del.txtBox(dele.getPosition()));
+        //
+        window.draw(Plus);
+        window.draw(plus.txtBox(Plus.getPosition()));
+        //
+        window.draw(Minu);
+        window.draw(minu.txtBox(Minu.getPosition()));
+        //
+        window.draw(Mul);
+        window.draw(mul.txtBox(Mul.getPosition()));
+        //
+        window.draw(Div);
+        window.draw(div.txtBox(Div.getPosition()));
+        
+        ////
         window.draw(Display.BoxScreen());
         window.draw(Display.printData());
+        while (const std::optional event = window.pollEvent()) // Closing windows functions
+        {
+            int dataRNsize = (Display.Get_Data()).size();
+
+            if (event->is<sf::Event::Closed>()) window.close();
+            auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
+
+            ///////////////// NumPad 
+            if (dataRNsize % 2 == 0)
+            {
+                if (number_1.getGlobalBounds().contains(mouse_pos)) 
+                {
+                    number_1.setFillColor(sf::Color(44,75,22)); 
+                    if (gateway[0] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        gateway[0] = 1;
+                        dataRNsize++;
+                        Display.add(setNumber[0]);
+                    }
+                }else{
+                    number_1.setFillColor(number1.ColorBox); 
+                }
+                if (number_2.getGlobalBounds().contains(mouse_pos))
+                {
+                    number_2.setFillColor(sf::Color(44,75,22)); 
+                    if (gateway[1] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        gateway[1] = 1;
+                        dataRNsize++;
+                        Display.add(setNumber[1]);
+                    }
+                }else{
+                    number_2.setFillColor(number2.ColorBox);
+                }
+                if (number_3.getGlobalBounds().contains(mouse_pos)) 
+                {
+                    number_3.setFillColor(sf::Color(44,75,22)); 
+                    if (gateway[2] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        gateway[2] = 1;
+                        dataRNsize++;
+                        Display.add(setNumber[2]);
+                    }
+                }else{
+                    number_3.setFillColor(number3.ColorBox); 
+                }
+                if (number_4.getGlobalBounds().contains(mouse_pos)){
+                    number_4.setFillColor(sf::Color(44,75,22));
+                    if (gateway[3] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        gateway[3] = 1;
+                        dataRNsize++;
+                        Display.add(setNumber[3]);
+                    }
+                }else{
+                    number_4.setFillColor(number4.ColorBox); 
+                }
+            }
+            /////////////////// 
+
+            ////////////////// OperPad
+
+
+
+
+            ///////////////////
+
+            /////////////////// del - getback
+            if (dele.getGlobalBounds().contains(mouse_pos)){
+                dele.setFillColor(sf::Color(44,75,22));
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && hasDel == 0){
+                    string data = Display.Get_Data();
+                    int size = data.size();
+                    if (size == 0) continue;
+                    gateway[(data[size-1]-1)-48] = 0;
+                    Display.pop();
+                    hasDel = 1;
+                }else{hasDel = 0;}
+            }else{
+                dele.setFillColor(number4.ColorBox); 
+            }
+            if (Get_Back.getGlobalBounds().contains(mouse_pos)) 
+            {
+                Get_Back.setFillColor(sf::Color(44,75,22)); 
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                    window.clear();
+                    state = MENU;
+                        
+                }
+            }
+            ////////////////////////////////////////////////
+        }
         window.display();
     }   
 }
