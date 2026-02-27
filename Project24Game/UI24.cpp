@@ -182,7 +182,7 @@ void GameSystem24(string setNumber){
             .name = to_string(setNumber[3]-48),
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild plus = {
+    buttonBuild plus = { //cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*40/100, // 2.5 when no float was assian as double type
             .FontSize = 50,
@@ -193,7 +193,7 @@ void GameSystem24(string setNumber){
             .name = "+",
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild minu = {
+    buttonBuild minu = { //cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*55/100, // 2.5 when no float was assian as double type
             .FontSize = 50,
@@ -204,7 +204,7 @@ void GameSystem24(string setNumber){
             .name = "-",
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild mul = {
+    buttonBuild mul = { //cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*70/100, // 2.5 when no float was assian as double type
             .FontSize = 50,
@@ -215,7 +215,7 @@ void GameSystem24(string setNumber){
             .name = "x",
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild div = {
+    buttonBuild div = { // cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*85/100, // 2.5 when no float was assian as double type
             .FontSize = 50,
@@ -226,7 +226,7 @@ void GameSystem24(string setNumber){
             .name = "/",
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild del = {
+    buttonBuild del = { // cic
             .posBox_x = windowSize_x*90/100,
             .posBox_y = WindowSize_y*35/100, // 2.5 when no float was assian as double type
             .FontSize = 25,
@@ -237,7 +237,7 @@ void GameSystem24(string setNumber){
             .name = "BS",
             .ColorBox = sf::Color(255,20,52)
         };   
-    buttonBuild GetBack = {
+    buttonBuild GetBack = { // cic
             .posBox_x = 25,
             .posBox_y = 25, // 2.5 when no float was assian as double type
             .FontSize = 75,
@@ -252,12 +252,12 @@ void GameSystem24(string setNumber){
     sf::RectangleShape number_2 = number2.builtButton();
     sf::RectangleShape number_3 = number3.builtButton();
     sf::RectangleShape number_4 = number4.builtButton();
-    sf::RectangleShape Plus = plus.builtButton();
-    sf::RectangleShape Minu = minu.builtButton();
-    sf::RectangleShape Mul = mul.builtButton();
-    sf::RectangleShape Div = div.builtButton();
-    sf::RectangleShape Get_Back = GetBack.builtButton();
-    sf::RectangleShape dele = del.builtButton();
+    sf::RectangleShape Plus = plus.builtButton(); //cic
+    sf::RectangleShape Minu = minu.builtButton(); // cic
+    sf::RectangleShape Mul = mul.builtButton(); // cic
+    sf::RectangleShape Div = div.builtButton(); // cic
+    sf::RectangleShape Get_Back = GetBack.builtButton(); //cic
+    sf::RectangleShape dele = del.builtButton(); //cic
     while (state == GAME24){
         window.clear(); 
         window.draw(number_1);
