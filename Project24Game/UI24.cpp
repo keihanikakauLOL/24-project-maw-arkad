@@ -182,67 +182,67 @@ void GameSystem24(string setNumber){
             .name = to_string(setNumber[3]-48),
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild plus = { //cic
+    Circle_buttonBuild plus = { //cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*40/100, // 2.5 when no float was assian as double type
             .FontSize = 50,
-            .buttonSize_x = 100,
-            .buttonSize_y = 100,
+            .Radius = 50,
+            .PointinCircle = 100,
             .X = 0,
             .Y = 0,
             .name = "+",
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild minu = { //cic
+    Circle_buttonBuild minu = { //cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*55/100, // 2.5 when no float was assian as double type
             .FontSize = 50,
-            .buttonSize_x = 100,
-            .buttonSize_y = 100,
+            .Radius = 50,
+            .PointinCircle = 100,
             .X = 0,
             .Y = 0,
             .name = "-",
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild mul = { //cic
+    Circle_buttonBuild mul = { //cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*70/100, // 2.5 when no float was assian as double type
             .FontSize = 50,
-            .buttonSize_x = 100,
-            .buttonSize_y = 100,
+            .Radius = 50,
+            .PointinCircle = 100,
             .X = 0,
             .Y = 0,
             .name = "x",
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild div = { // cic
+    Circle_buttonBuild div = { // cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*85/100, // 2.5 when no float was assian as double type
             .FontSize = 50,
-            .buttonSize_x = 100,
-            .buttonSize_y = 100,
+            .Radius = 50,
+            .PointinCircle = 100,
             .X = 0,
             .Y = 0,
             .name = "/",
             .ColorBox = sf::Color(255,20,52)
         };
-    buttonBuild del = { // cic
+    Circle_buttonBuild del = { // cic
             .posBox_x = windowSize_x*90/100,
             .posBox_y = WindowSize_y*35/100, // 2.5 when no float was assian as double type
             .FontSize = 25,
-            .buttonSize_x = 50,
-            .buttonSize_y = 50,
+            .Radius = 25,
+            .PointinCircle = 100,
             .X = 0,
             .Y = 0,
             .name = "BS",
             .ColorBox = sf::Color(255,20,52)
         };   
-    buttonBuild GetBack = { // cic
+    Circle_buttonBuild GetBack = { // cic
             .posBox_x = 25,
             .posBox_y = 25, // 2.5 when no float was assian as double type
             .FontSize = 75,
-            .buttonSize_x = 50,
-            .buttonSize_y = 50,
+            .Radius = 25,
+            .PointinCircle = 100,
             .X = 0,
             .Y = 0,
             .name = "Icon",
@@ -252,12 +252,12 @@ void GameSystem24(string setNumber){
     sf::RectangleShape number_2 = number2.builtButton();
     sf::RectangleShape number_3 = number3.builtButton();
     sf::RectangleShape number_4 = number4.builtButton();
-    sf::RectangleShape Plus = plus.builtButton(); //cic
-    sf::RectangleShape Minu = minu.builtButton(); // cic
-    sf::RectangleShape Mul = mul.builtButton(); // cic
-    sf::RectangleShape Div = div.builtButton(); // cic
-    sf::RectangleShape Get_Back = GetBack.builtButton(); //cic
-    sf::RectangleShape dele = del.builtButton(); //cic
+    sf::CircleShape Plus = plus.Circle_builtButton(); //cic
+    sf::CircleShape Minu = minu.Circle_builtButton(); // cic
+    sf::CircleShape Mul = mul.Circle_builtButton(); // cic
+    sf::CircleShape Div = div.Circle_builtButton(); // cic
+    sf::CircleShape Get_Back = GetBack.Circle_builtButton(); //cic
+    sf::CircleShape dele = del.Circle_builtButton(); //cic
     while (state == GAME24){
         window.clear(); 
         window.draw(number_1);
@@ -273,22 +273,22 @@ void GameSystem24(string setNumber){
         window.draw(number4.txtBox(number_4.getPosition()));
         //
         window.draw(Get_Back);
-        window.draw(GetBack.txtBox(Get_Back.getPosition()));
+        window.draw(GetBack.Circle_txtBox(Get_Back.getPosition()));
         //
         window.draw(dele);
-        window.draw(del.txtBox(dele.getPosition()));
+        window.draw(del.Circle_txtBox(dele.getPosition()));
         //
         window.draw(Plus);
-        window.draw(plus.txtBox(Plus.getPosition()));
+        window.draw(plus.Circle_txtBox(Plus.getPosition()));
         //
         window.draw(Minu);
-        window.draw(minu.txtBox(Minu.getPosition()));
+        window.draw(minu.Circle_txtBox(Minu.getPosition()));
         //
         window.draw(Mul);
-        window.draw(mul.txtBox(Mul.getPosition()));
+        window.draw(mul.Circle_txtBox(Mul.getPosition()));
         //
         window.draw(Div);
-        window.draw(div.txtBox(Div.getPosition()));
+        window.draw(div.Circle_txtBox(Div.getPosition()));
         
         ////
         window.draw(Display.BoxScreen());

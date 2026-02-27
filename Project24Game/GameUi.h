@@ -51,6 +51,7 @@ sf::RectangleShape buttonBuild::builtButton(){
     return button;
 };
 
+
 sf:: Text buttonBuild::txtBox(sf::Vector2f buttonCenter){
     sf::Text Text(font,name,FontSize); 
     sf::FloatRect bounds = Text.getLocalBounds();
@@ -123,6 +124,36 @@ void Bar_Chart(sf::RenderWindow& window, int data[], int data_n)
     }
 }
 
+class Circle_buttonBuild{
+    public:
+        float posBox_x;
+        float posBox_y;
+        float FontSize;
+        float Radius;
+        float PointinCircle;
+        float X;
+        float Y;
+        string name;
+        sf::Color ColorBox;
+        sf::CircleShape Circle_builtButton(); 
+        sf::Text Circle_txtBox(sf::Vector2f);
+};
+
+sf::CircleShape Circle_buttonBuild::Circle_builtButton(){
+    sf::CircleShape Circle(Radius, PointinCircle);
+    Circle.setOrigin(Circle.getGeometricCenter());
+    Circle.setPosition({posBox_x,posBox_y});
+    Circle.setFillColor(ColorBox);
+    return Circle;
+}
+
+sf::Text Circle_buttonBuild::Circle_txtBox(sf::Vector2f buttonCenter){
+    sf::Text Text(font,name,FontSize); 
+    sf::FloatRect bounds = Text.getLocalBounds();
+    Text.setOrigin({bounds.position.x+bounds.size.x/2,FontSize-bounds.position.y});
+    Text.setPosition(buttonCenter); 
+    return Text;
+}
 
 
 
