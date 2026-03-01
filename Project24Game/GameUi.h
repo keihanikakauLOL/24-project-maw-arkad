@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
+#include <vector>
+#include <sstream>
 #include <algorithm>
 
 using namespace std;
@@ -59,31 +61,74 @@ sf:: Text buttonBuild::txtBox(sf::Vector2f buttonCenter){
     Text.setPosition({posBox_x,posBox_y}); 
     return Text;
 }
+/// ////////////////////////////////
 
 class Screen{
-    string strData = "";
-    public:
+   
+    vector<double> Data;
+    string dataStr = "";
+    char OpRn;
+    public: 
+        bool NumAllowed = 1;
         void add(char);
         sf::Text printData();
         sf::RectangleShape BoxScreen();
-        string Get_Data();
-        void pop();
+        int Get_size();
+        void dataReset();
+        void Calculate();
 };
 
-void Screen::pop(){
-    strData.pop_back();
+
+void Screen::Calculate(){
+    if (Data.size() == 2){
+        if (OpRn == '+'){
+           Data[0] = Data[0]+Data[1];
+           Data.pop_back();
+        }
+        dataStr = to_string(Data[0]);
+        if (OpRn == '-'){
+           Data[0] = Data[0]-Data[1];
+           Data.pop_back();
+        }
+        dataStr = to_string(Data[0]);
+        if (OpRn == 'x'){
+           Data[0] = Data[0]*Data[1];
+           Data.pop_back();
+        }
+        dataStr = to_string(Data[0]);
+        if (OpRn == '/'){
+           Data[0] = Data[0]/Data[1];
+           Data.pop_back();
+        }
+        stringstream c;
+        c << fixed << setprecision(2) << Data[0];
+        dataStr = c.str();
+    }
+}
+
+void Screen::dataReset(){
+    Data.clear();
+    NumAllowed = 1;
+    dataStr = "";
 }
 
 void Screen::add(char inputNumber){
-    strData+=inputNumber;
+    if (NumAllowed == 1){
+        Data.push_back((int)inputNumber-48);
+        dataStr += inputNumber;
+    }else{
+        OpRn = inputNumber;
+        dataStr += inputNumber;
+    }
 }
 
+
 sf::Text Screen::printData(){
-    sf::Text Data(font,strData,100);
-    sf::FloatRect boundScreen = Data.getLocalBounds();
-    Data.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
-    Data.setPosition({windowSize_x/2,150});
-    return Data;
+    sf::Text Datas(font,dataStr,100);
+    sf::FloatRect boundScreen = Datas.getLocalBounds();
+    Datas.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
+    Datas.setPosition({windowSize_x/2,150});
+    return Datas;
 }
 
 sf::RectangleShape Screen::BoxScreen(){
@@ -94,9 +139,9 @@ sf::RectangleShape Screen::BoxScreen(){
     return Box;
 }
 
-string Screen::Get_Data(){
-    return strData;
-}
+// int Screen::Get_size(){
+//     return dataStr.size();
+// }
 
 void Bar_Chart(sf::RenderWindow& window, int data[], int data_n)
 {
@@ -150,7 +195,7 @@ sf::CircleShape Circle_buttonBuild::Circle_builtButton(){
 sf::Text Circle_buttonBuild::Circle_txtBox(sf::Vector2f buttonCenter){
     sf::Text Text(font,name,FontSize); 
     sf::FloatRect bounds = Text.getLocalBounds();
-    Text.setOrigin({bounds.position.x+bounds.size.x/2,FontSize-bounds.position.y});
+    Text.setOrigin({(bounds.position.x+bounds.size.x/2)+X,(FontSize-bounds.position.y)+Y});
     Text.setPosition(buttonCenter); 
     return Text;
 }

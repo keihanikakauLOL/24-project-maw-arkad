@@ -20,7 +20,7 @@ int main()
     while (window.isOpen())
     {
         if (state == MENU){Menu();}
-        if (state == GAME24){GameSystem24("1234");}
+        if (state == GAME24){GameSystem24("9423");}
         if (state == SCORE_BOARD){ScoreBoard(new int[4]{10, 20, 30, 40});}
     }
     
@@ -136,7 +136,7 @@ void Menu(){
 
 void GameSystem24(string setNumber){
     Screen Display;
-    bool gateway[] = {0,0,0,0,0,0,0,0};
+    bool gateway[] = {0,0,0,0};
     bool hasDel = 0;
     buttonBuild number1 = {
         .posBox_x = windowSize_x*25/100,
@@ -189,7 +189,7 @@ void GameSystem24(string setNumber){
             .Radius = 50,
             .PointinCircle = 100,
             .X = 0,
-            .Y = 0,
+            .Y = 5,
             .name = "+",
             .ColorBox = sf::Color(255,20,52)
         };
@@ -200,7 +200,7 @@ void GameSystem24(string setNumber){
             .Radius = 50,
             .PointinCircle = 100,
             .X = 0,
-            .Y = 0,
+            .Y = 20,
             .name = "-",
             .ColorBox = sf::Color(255,20,52)
         };
@@ -211,7 +211,7 @@ void GameSystem24(string setNumber){
             .Radius = 50,
             .PointinCircle = 100,
             .X = 0,
-            .Y = 0,
+            .Y = 15,
             .name = "x",
             .ColorBox = sf::Color(255,20,52)
         };
@@ -240,7 +240,7 @@ void GameSystem24(string setNumber){
     Circle_buttonBuild GetBack = { // cic
             .posBox_x = 25,
             .posBox_y = 25, // 2.5 when no float was assian as double type
-            .FontSize = 75,
+            .FontSize = 20,
             .Radius = 25,
             .PointinCircle = 100,
             .X = 0,
@@ -295,21 +295,20 @@ void GameSystem24(string setNumber){
         window.draw(Display.printData());
         while (const std::optional event = window.pollEvent()) // Closing windows functions
         {
-            int dataRNsize = (Display.Get_Data()).size();
 
             if (event->is<sf::Event::Closed>()) window.close();
             auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
 
             ///////////////// NumPad 
-            if (dataRNsize % 2 == 0)
+            if (Display.NumAllowed == 1)
             {
                 if (number_1.getGlobalBounds().contains(mouse_pos)) 
                 {
                     number_1.setFillColor(sf::Color(44,75,22)); 
                     if (gateway[0] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         gateway[0] = 1;
-                        dataRNsize++;
                         Display.add(setNumber[0]);
+                        Display.NumAllowed = 0;
                     }
                 }else{
                     number_1.setFillColor(number1.ColorBox); 
@@ -319,8 +318,8 @@ void GameSystem24(string setNumber){
                     number_2.setFillColor(sf::Color(44,75,22)); 
                     if (gateway[1] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         gateway[1] = 1;
-                        dataRNsize++;
-                        Display.add(setNumber[1]);
+                       Display.add(setNumber[1]); 
+                       Display.NumAllowed = 0;
                     }
                 }else{
                     number_2.setFillColor(number2.ColorBox);
@@ -330,8 +329,8 @@ void GameSystem24(string setNumber){
                     number_3.setFillColor(sf::Color(44,75,22)); 
                     if (gateway[2] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         gateway[2] = 1;
-                        dataRNsize++;
                         Display.add(setNumber[2]);
+                        Display.NumAllowed = 0;
                     }
                 }else{
                     number_3.setFillColor(number3.ColorBox); 
@@ -340,16 +339,51 @@ void GameSystem24(string setNumber){
                     number_4.setFillColor(sf::Color(44,75,22));
                     if (gateway[3] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         gateway[3] = 1;
-                        dataRNsize++;
                         Display.add(setNumber[3]);
+                        Display.NumAllowed = 0;
                     }
                 }else{
                     number_4.setFillColor(number4.ColorBox); 
                 }
             }
-            /////////////////// 
-
-            ////////////////// OperPad
+            else{
+                if (Plus.getGlobalBounds().contains(mouse_pos)){
+                    Plus.setFillColor(sf::Color(44,75,22));
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        Display.add('+');
+                        Display.NumAllowed = 1;
+                    }
+                }else{
+                    Plus.setFillColor(plus.ColorBox);
+                }
+                if (Minu.getGlobalBounds().contains(mouse_pos)){
+                    Minu.setFillColor(sf::Color(44,75,22));
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        Display.add('-');
+                        Display.NumAllowed = 1;
+                    }
+                }else{
+                    Minu.setFillColor(minu.ColorBox);
+                }
+                if (Mul.getGlobalBounds().contains(mouse_pos)){
+                    Mul.setFillColor(sf::Color(44,75,22));
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        Display.add('x');
+                        Display.NumAllowed = 1;
+                    }
+                }else{
+                    Mul.setFillColor(mul.ColorBox);
+                }
+                if (Div.getGlobalBounds().contains(mouse_pos)){
+                    Div.setFillColor(sf::Color(44,75,22));
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                        Display.add('/');
+                        Display.NumAllowed = 1;
+                    }
+                }else{
+                    Div.setFillColor(div.ColorBox);
+                }
+            }
 
 
 
@@ -360,11 +394,8 @@ void GameSystem24(string setNumber){
             if (dele.getGlobalBounds().contains(mouse_pos)){
                 dele.setFillColor(sf::Color(44,75,22));
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && hasDel == 0){
-                    string data = Display.Get_Data();
-                    int size = data.size();
-                    if (size == 0) continue;
-                    gateway[(data[size-1]-1)-48] = 0;
-                    Display.pop();
+                    Display.dataReset();
+                    for(int l = 0 ; l < 4; l++) gateway[l] = 0;
                     hasDel = 1;
                 }else{hasDel = 0;}
             }else{
@@ -380,6 +411,7 @@ void GameSystem24(string setNumber){
                 }
             }
             ////////////////////////////////////////////////
+            Display.Calculate();
         }
         window.display();
     }   
