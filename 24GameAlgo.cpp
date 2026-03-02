@@ -179,7 +179,7 @@ bool Solvethegame(double problem[], int target) {
     return false;
 }
 
-void createList (int target) {
+void createList (int target = 24) {
     ifstream source;
     ofstream dest("list.txt");
     source.open("num.txt");
@@ -212,37 +212,48 @@ void createList (int target) {
     dest.close();
 }
 
+string getfile() {
+    static vector<int> index;
+    static size_t current = 0;
+    static bool is_loaded = false;
 
-string getfile(string num, string list, int result = 24) {
-    createList(result);
-    ifstream l;
-    l.open(list);
-    string listString;
-    vector<int> line;
+    const string list = "list.txt";
+    const string num = "num.txt";
 
-    while (getline(l, listString)) {
-        line.push_back(stoi(listString));
+    // 2. โหลด Index เข้า Vector (ทำแค่ครั้งแรกที่เรียกฟังก์ชัน)
+    if (!is_loaded) {
+        ifstream idxFile(list);
+        string val;
+        while (getline(idxFile, val)) {
+            index.push_back(stoi(val));
+        }
+        is_loaded = true;
     }
 
-    int target = line[rand() % line.size()];
-    int count = 0;
 
-    ifstream q;
-    q.open(num);
-    string numString;
+    // 4. อ่านไฟล์ข้อมูลตาม Index ปัจจุบัน
+    ifstream file(num);
+    string line;
+    int target = index[current];
+    int line_num = 0;
+    bool found = false;
+    string result;
 
-    while (getline(q, numString)) {
-        count++;
-        if(count == target) {
-            return numString;
+    current++;
+    
+    while (getline(file, line)) {
+        line_num++;
+        if (line_num == target) {
+            result = line;
+            found = true;
+            break;
         }
     }
-    l.close();
-    q.close();
-    return "";
+    return result;
 }
 
 int main() {
-    srand(time(0));
-    cout << getfile("num.txt","list.txt",24);
+    for (int i = 0; i < 217; i++) {
+        cout << getfile() << endl;
+    }
 }
