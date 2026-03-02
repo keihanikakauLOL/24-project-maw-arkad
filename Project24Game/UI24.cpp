@@ -1,9 +1,10 @@
 #include "GameUi.h"
 
-void GameSystem24(string);
+void GameSystem24();
 void ScoreBoard(int data[], int data_n);
 void Menu();
 
+bool inGame24 = 0;
 sf::Texture texture("Images/Background.jpg");
 sf::Sprite sprite(texture);
 sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name'
@@ -26,15 +27,18 @@ int main()
     // Optional: Set the position to (0, 0) (default) and scale the sprite to the window size if needed
     sprite.setPosition({0, 0});
     sprite.setScale({800.f / texture.getSize().x, 800.f / texture.getSize().y});
-    window.setFramerateLimit(90);
-
+    window.setFramerateLimit(144);
+    
     while (window.isOpen())
     {
-        if (state == MENU){Menu();}
-        if (state == GAME24){GameSystem24("9423");}
-        if (state == SCORE_BOARD){
-            int data[] = {10, 20, 15, 5}; // Example data for the bar chart
-            ScoreBoard(data, 4);
+        while (const std::optional event = window.pollEvent()){
+            if (event->is<sf::Event::Closed>()) window.close();
+            if (state == MENU){Menu();}
+            if (state == GAME24){GameSystem24();}
+            if (state == SCORE_BOARD){
+                int data[] = {10, 20, 15, 5}; // Example data for the bar chart
+                ScoreBoard(data, 4);
+            }
         }
     }
     
@@ -95,13 +99,10 @@ void Menu(){
     
     
     // GameOn
-    while (state == MENU) // using to make window always open 
-    {        
+    while (state == MENU)
+    {
         window.clear();
-        while (const std::optional event = window.pollEvent()) // Closing windows functions
-        {
-            if (event->is<sf::Event::Closed>()) window.close();// "close requested" event: we close the window 
-            auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
             if (button_24.getGlobalBounds().contains(mouse_pos)) // check button is coline with mouse : augmentNeedtoCheck.getGlobalBound().contains(whatIscheckwith); >> getGlobalBound() = check coline
             {
                 button_24.setFillColor(sf::Color(0,75,22)); // we can create animated or click to process
@@ -145,11 +146,12 @@ void Menu(){
             window.draw(buttonN.txtBox(buttonN.builtButton().getGeometricCenter())); 
             window.draw(buttonScore.txtBox(buttonScore.builtButton().getGeometricCenter()));
             window.display(); 
-        }    
-    }  
+    }      
+    
 }
 
-void GameSystem24(string setNumber){
+void GameSystem24(){
+    string setNumber = "1236";
     Screen Display;
     bool gateway[] = {0,0,0,0};
     bool hasDel = 0;
@@ -267,13 +269,14 @@ void GameSystem24(string setNumber){
     sf::RectangleShape number_2 = number2.builtButton();
     sf::RectangleShape number_3 = number3.builtButton();
     sf::RectangleShape number_4 = number4.builtButton();
-    sf::CircleShape Plus = plus.Circle_builtButton(); //cic
-    sf::CircleShape Minu = minu.Circle_builtButton(); // cic
-    sf::CircleShape Mul = mul.Circle_builtButton(); // cic
-    sf::CircleShape Div = div.Circle_builtButton(); // cic
-    sf::CircleShape Get_Back = GetBack.Circle_builtButton(); //cic
-    sf::CircleShape dele = del.Circle_builtButton(); //cic
+    sf::CircleShape Plus = plus.Circle_builtButton(); 
+    sf::CircleShape Minu = minu.Circle_builtButton(); 
+    sf::CircleShape Mul = mul.Circle_builtButton(); 
+    sf::CircleShape Div = div.Circle_builtButton(); 
+    sf::CircleShape Get_Back = GetBack.Circle_builtButton(); 
+    sf::CircleShape dele = del.Circle_builtButton(); 
     while (state == GAME24){
+        auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
         window.clear(); 
         window.draw(number_1);
         window.draw(number1.txtBox(number_1.getPosition()));
@@ -307,35 +310,28 @@ void GameSystem24(string setNumber){
         
         ////
         window.draw(Display.BoxScreen());
-        window.draw(Display.printData());
-        while (const std::optional event = window.pollEvent()) // Closing windows functions
-        {
-
-            if (event->is<sf::Event::Closed>()) window.close();
-            auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
-
             ///////////////// NumPad 
-            if (Display.NumAllowed == 1)
+        if (Display.NumAllowed == 1)
+        {
+            if (number_1.getGlobalBounds().contains(mouse_pos)) 
             {
-                if (number_1.getGlobalBounds().contains(mouse_pos)) 
-                {
-                    number_1.setFillColor(sf::Color(44,75,22)); 
-                    if (gateway[0] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                        gateway[0] = 1;
-                        Display.add(setNumber[0]);
-                        Display.NumAllowed = 0;
-                    }
-                }else{
-                    number_1.setFillColor(number1.ColorBox); 
+                number_1.setFillColor(sf::Color(44,75,22)); 
+                if (gateway[0] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                    gateway[0] = 1;
+                    Display.add(setNumber[0]);
+                    Display.NumAllowed = 0;
                 }
-                if (number_2.getGlobalBounds().contains(mouse_pos))
-                {
-                    number_2.setFillColor(sf::Color(44,75,22)); 
-                    if (gateway[1] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                        gateway[1] = 1;
-                       Display.add(setNumber[1]); 
-                       Display.NumAllowed = 0;
-                    }
+            }else{
+                number_1.setFillColor(number1.ColorBox); 
+            }
+            if (number_2.getGlobalBounds().contains(mouse_pos))
+            {
+                number_2.setFillColor(sf::Color(44,75,22)); 
+                if (gateway[1] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                    gateway[1] = 1;
+                    Display.add(setNumber[1]); 
+                    Display.NumAllowed = 0;
+                }
                 }else{
                     number_2.setFillColor(number2.ColorBox);
                 }
@@ -427,9 +423,9 @@ void GameSystem24(string setNumber){
             }
             ////////////////////////////////////////////////
             Display.Calculate();
-        }
-        window.display();
-    }   
+            window.draw(Display.printData());
+            window.display();
+    }
 }
 
 void ScoreBoard(int data[], int data_n){
@@ -447,25 +443,22 @@ void ScoreBoard(int data[], int data_n){
         };
     sf::CircleShape Back_Button_Rect = GetBack.Circle_builtButton();
         while (state == SCORE_BOARD){
+            auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
             window.clear();
             Bar_Chart(window, data, data_n);
             window.draw(Back_Button_Rect);
-           
-            while (const std::optional event = window.pollEvent()) // Closing windows functions
+            // "close requested" event: we close the window 
+            if (Back_Button_Rect.getGlobalBounds().contains(mouse_pos)) 
             {
-                if (event->is<sf::Event::Closed>()) window.close();
-                auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
-                if (Back_Button_Rect.getGlobalBounds().contains(mouse_pos)) 
-                {
-                    Back_Button_Rect.setFillColor(sf::Color(44,75,22)); 
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                        window.clear();
-                        state = MENU;
-                    }
-                }else{
-                    Back_Button_Rect.setFillColor(GetBack.ColorBox); 
+                Back_Button_Rect.setFillColor(sf::Color(44,75,22)); 
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                    window.clear();
+                    state = MENU;
                 }
+            }else{
+                Back_Button_Rect.setFillColor(GetBack.ColorBox); 
             }
-             window.display();
-        }
+            window.display();
+            }
+             
 }
