@@ -8,6 +8,8 @@
 #include <set>
 #include <ctime>
 #include <cstdlib>
+#include <random>
+#include <iterator>
 using namespace std;
 
 const double verysmall = 1e-9;
@@ -182,6 +184,7 @@ void createList (int target) {
     ofstream dest("list.txt");
     source.open("num.txt");
     string n;
+    vector <int> shuff;
     int count = 0;
     while(getline(source, n)) {
         count++;
@@ -193,12 +196,22 @@ void createList (int target) {
         double* arr = prob.data();
 
         if (check(arr, 4, target)) {
-            dest << count << "\n";
+            shuff.push_back(count);
         }
     }
+
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(shuff.begin(), shuff.end(), g);
+
+    for (int i = 0; i < shuff.size(); i++) {
+        dest << shuff[i] << endl;
+    }
+
     source.close();
     dest.close();
 }
+
 
 string getfile(string num, string list, int result = 24) {
     createList(result);
@@ -208,9 +221,7 @@ string getfile(string num, string list, int result = 24) {
     vector<int> line;
 
     while (getline(l, listString)) {
-        int num = stoi(listString);
-        line.push_back(num);
-
+        line.push_back(stoi(listString));
     }
 
     int target = line[rand() % line.size()];
@@ -218,12 +229,12 @@ string getfile(string num, string list, int result = 24) {
 
     ifstream q;
     q.open(num);
-    string numSting;
+    string numString;
 
-    while (getline(q, numSting)) {
+    while (getline(q, numString)) {
         count++;
         if(count == target) {
-            return numSting;
+            return numString;
         }
     }
     l.close();
@@ -233,5 +244,5 @@ string getfile(string num, string list, int result = 24) {
 
 int main() {
     srand(time(0));
-    cout << getfile("num.txt","list.txt",56);
+    cout << getfile("num.txt","list.txt",24);
 }
