@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <set>
 #include <ctime>
 #include <cstdlib>
 using namespace std;
@@ -84,7 +85,7 @@ bool permutationforcheck (double prob[], int target) {
 bool Checksol(double problem[], string expression[], int n, int target) {
     if(n == 1) {
         if (abs(problem[0] - target) < verysmall) {
-            cout << "Solution: " << expression[0] << " = 24" <<endl;
+            cout << "Solution: " << expression[0] << " = " << target <<endl;
             return true;
         }
         else {
@@ -231,6 +232,6 @@ string getfile(string num, string list) {
 
 int main() {
     srand(time(0));
-    createList(67);
+    createList(79);
     cout << getfile("num.txt","list.txt");
 }
