@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <map>
 
 using namespace std;
 
@@ -40,6 +41,8 @@ sf::Text Title::TitleName(){
     sf::FloatRect boundTitle = Title_24.getLocalBounds();
     Title_24.setOrigin({boundTitle.position.x+boundTitle.size.x/2,TittleGameSize-boundTitle.position.y});
     Title_24.setPosition({windowSize_x/2,150});
+    Title_24.setOutlineColor(sf::Color::Black);
+    Title_24.setOutlineThickness(2.f);
     return Title_24;
 };
 
@@ -58,7 +61,9 @@ sf:: Text buttonBuild::txtBox(sf::Vector2f buttonCenter){
     sf::Text Text(font,name,FontSize); 
     sf::FloatRect bounds = Text.getLocalBounds();
     Text.setOrigin({bounds.position.x+bounds.size.x/2,FontSize-bounds.position.y});
-    Text.setPosition({posBox_x,posBox_y}); 
+    Text.setPosition({posBox_x,posBox_y});
+    Text.setOutlineColor(sf::Color::Black);
+    Text.setOutlineThickness(2.f);
     return Text;
 }
 /// ////////////////////////////////
@@ -143,29 +148,101 @@ sf::RectangleShape Screen::BoxScreen(){
 //     return dataStr.size();
 // }
 
-void Bar_Chart(sf::RenderWindow& window, int data[], int data_n)
+void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
 {
-    
-    int data_max = *max_element(data, data + data_n);
+    vector<pair<string,int>> sortedData(data.begin(), data.end());
+    sort(sortedData.begin(), sortedData.end(),[](const auto& a, const auto& b)
+     {
+         return a.second > b.second; // มากไปน้อย
+     });
+    int Top_THREE = min(3, (int)sortedData.size());
+    int data_max = sortedData[0].second;
     // size of window
         float window_w = static_cast<float>(window.getSize().x);
         float window_h = static_cast<float>(window.getSize().y);
     //parameter
-        float space = window_w / data_n;
-        float size = 0.6f * space;
-        float scale = 0.9f * window_h / data_max;
+        float baseY = 680.f;              // ยกฐานขึ้นจากขอบล่าง
+        float space = window_w / 3.f;     // แบ่ง 3 ช่อง
+        float barWidth = 160.f;
+        float scale = 320.f / data_max;   // scale พอดีจอ
+        float No_1_barWidth = 200.f; // แท่งที่ 1 ใหญ่กว่า
 
 
-    sf::RectangleShape bar;
-    bar.setOrigin({size/2.f, 0.f});
-    bar.setScale({1.f, -1.f});
-    bar.setFillColor(sf::Color(128,128,128));
+    // podium
+    vector<int> podiumOrder = {1, 0, 2}; // (2,1,3)
 
-    for (int i = 0; i < data_n; i++)
+    for (int i = 0; i < Top_THREE; i++)
     {
-        bar.setSize({size, data[i] * scale});
-        bar.setPosition({(i + 0.5f) * space, window_h});
+        int dataIndex = podiumOrder[i];
+        auto& [name, point] = sortedData[dataIndex];
+        float barHeight = point * scale;
+
+        // ทำ podium effect (แท่งกลางสูงกว่า)
+        if (i == 0) barHeight += 40.f;
+        float width = (dataIndex == 0) ? No_1_barWidth : barWidth;
+        float posX = (i + 0.5f) * space;
+        float posY = baseY - barHeight;
+
+        // BAR
+        sf::RectangleShape bar({width, barHeight});
+        bar.setOrigin({width/2.f, 0.f});
+        bar.setPosition({posX, baseY});
+        bar.setScale({1.f, -1.f});
+        if (dataIndex == 0)
+            bar.setFillColor(sf::Color(0,0,102));
+        else
+            bar.setFillColor(sf::Color(0,76,153));
         window.draw(bar);
+
+       
+        // SCORE (กลางแท่ง)
+        sf::Text scoreText(font, to_string(point));
+        scoreText.setCharacterSize(24);
+        scoreText.setFillColor(sf::Color::White);
+        scoreText.setOutlineColor(sf::Color::Black);
+        scoreText.setOutlineThickness(2.f);
+
+        sf::FloatRect scoreBounds = scoreText.getLocalBounds();
+        scoreText.setOrigin({scoreBounds.position.x + scoreBounds.size.x / 2.f,scoreBounds.position.y + scoreBounds.size.y / 2.f});
+        scoreText.setPosition({posX, baseY - barHeight/2.f});
+        window.draw(scoreText);
+
+        
+        // NAME (บนแท่ง)
+        sf::Text nameText(font, name);
+        nameText.setCharacterSize(26);
+        nameText.setFillColor(sf::Color::White);
+        nameText.setOutlineColor(sf::Color::Black);
+        nameText.setOutlineThickness(2.f);
+
+        sf::FloatRect nameBounds = nameText.getLocalBounds();
+        nameText.setOrigin({nameBounds.position.x + nameBounds.size.x / 2.f,nameBounds.position.y + nameBounds.size.y / 2.f});
+        nameText.setPosition({posX, posY - 15.f});
+        window.draw(nameText);
+
+        
+        // RANK CIRCLE
+        sf::CircleShape circle(28.f);
+        circle.setOrigin({28.f, 28.f});
+        circle.setPosition({posX, posY - 60.f});
+        if (dataIndex == 0)
+            circle.setFillColor(sf::Color(255,215,0));
+        else if (dataIndex == 1)
+            circle.setFillColor(sf::Color(192,192,192));
+        else
+            circle.setFillColor(sf::Color(205,127,50));
+        window.draw(circle);
+
+        sf::Text rankText(font, to_string(dataIndex+1));
+        rankText.setCharacterSize(22);
+        rankText.setFillColor(sf::Color::White);
+        rankText.setOutlineColor(sf::Color::Black);
+        rankText.setOutlineThickness(2.f);
+
+        sf::FloatRect rankBounds = rankText.getLocalBounds();
+        rankText.setOrigin({rankBounds.position.x + rankBounds.size.x / 2.f,rankBounds.position.y + rankBounds.size.y / 2.f});
+        rankText.setPosition(circle.getPosition());
+        window.draw(rankText);
     }
 }
 
@@ -200,7 +277,37 @@ sf::Text Circle_buttonBuild::Circle_txtBox(sf::Vector2f buttonCenter){
     return Text;
 }
 
+void drawBackArrow(sf::RenderWindow& window, sf::Vector2f position, float scale = 1.0f, sf::Color color = sf::Color::White){
+    sf::ConvexShape arrow;
+    float bodyLength = 15.f;
+    float bodyHeight = 8.f;
+    float headLength = 15.f;
+    float headHeight = 20.f;
 
+    // Body (Rectangle) 
+    sf::RectangleShape body;
+    body.setSize({bodyLength, bodyHeight});
+    body.setFillColor(color);
+    body.setOrigin({0.f, bodyHeight / 2.f});
+    body.setPosition(position);
+    body.setOutlineColor(sf::Color::Black);
+    body.setOutlineThickness(2.f);
 
+    // Head (Triangle)
+    sf::ConvexShape head;
+    head.setPointCount(3);
+    head.setPoint(0, {-headLength,                  0});         
+    head.setPoint(1, {0          , -headHeight / 2.f});
+    head.setPoint(2, {0          ,  headHeight / 2.f});
+    head.setFillColor(color);
+    head.setOrigin({0.f, 0.f});
+    head.setPosition(position);
+    head.setOutlineColor(sf::Color::Black);
+    head.setOutlineThickness(2.f);
 
-
+    // scale ทั้ง body และ head
+    body.setScale({scale, scale});
+    head.setScale({scale, scale});
+    window.draw(body);
+    window.draw(head);
+}
