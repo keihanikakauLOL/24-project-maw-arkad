@@ -200,7 +200,8 @@ void createList (int target) {
     dest.close();
 }
 
-string getfile(string num, string list) {
+string getfile(string num, string list, int result = 24) {
+    createList(result);
     ifstream l;
     l.open(list);
     string listString;
@@ -232,6 +233,5 @@ string getfile(string num, string list) {
 
 int main() {
     srand(time(0));
-    createList(79);
-    cout << getfile("num.txt","list.txt");
+    cout << getfile("num.txt","list.txt",56);
 }
