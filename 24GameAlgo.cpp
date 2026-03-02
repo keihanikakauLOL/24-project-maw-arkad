@@ -2,13 +2,88 @@
 #include <algorithm>
 #include <cmath>
 #include <string>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <ctime>
+#include <cstdlib>
 using namespace std;
 
 const double verysmall = 1e-9;
 
-bool Check(double problem[], string expression[], int n) {
+bool check(double prob[], int n, int target) {
     if(n == 1) {
-        if (abs(problem[0] - 24) < verysmall) {
+        return abs(prob[0] - target) < verysmall;
+    }
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i == j) {
+                continue;
+            }
+
+            double storage[4];
+            int count = 0;
+
+            for(int k = 0; k < n; k++) {
+                if(k != i && k != j) {
+                    storage[count] = prob[k];
+                    count++;
+                }
+            }
+
+            double a = prob[i];
+            double b = prob[j];
+
+            // +
+
+            //count เป็น 2
+            storage[count] = a + b;
+            // count + 1 เพื่อให้เป็นเลข 3
+            if (check(storage, count + 1, target)) {
+                return true;
+            }
+
+            // -
+
+            storage[count] = a - b;
+            if (check(storage, count + 1, target)) {
+                return true;
+            }
+
+            // *
+
+            storage[count] = a * b;
+            if (check(storage, count + 1, target)) {
+                return true;
+            }
+
+            // /
+
+            if(abs(b) != 0) {
+                storage[count] = a / b;
+                if (check(storage, count + 1, target)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool permutationforcheck (double prob[], int target) {
+    sort(prob, prob + 4);
+
+    do {
+        if(check(prob, 4, target)) {
+            return true;
+        }
+    } while(next_permutation(prob, prob + 4));
+    return false;
+}
+
+bool Checksol(double problem[], string expression[], int n, int target) {
+    if(n == 1) {
+        if (abs(problem[0] - target) < verysmall) {
             cout << "Solution: " << expression[0] << " = 24" <<endl;
             return true;
         }
@@ -46,7 +121,7 @@ bool Check(double problem[], string expression[], int n) {
             NumStorage[count] = a + b;
             ExprsStorage[count] = "(" + ea + "+" + eb + ")";
             // count + 1 เพื่อให้เป็นเลข 3
-            if (Check(NumStorage, ExprsStorage, count + 1)) {
+            if (Checksol(NumStorage, ExprsStorage, count + 1, target)) {
                 return true;
             }
 
@@ -54,7 +129,7 @@ bool Check(double problem[], string expression[], int n) {
 
             NumStorage[count] = a - b;
             ExprsStorage[count] = "(" + ea + "-" + eb + ")";
-            if (Check(NumStorage, ExprsStorage, count + 1)) {
+            if (Checksol(NumStorage, ExprsStorage, count + 1, target)) {
                 return true;
             }
 
@@ -62,7 +137,7 @@ bool Check(double problem[], string expression[], int n) {
 
             NumStorage[count] = a * b;
             ExprsStorage[count] = "(" + ea + "*" + eb + ")";
-            if (Check(NumStorage, ExprsStorage, count + 1)) {
+            if (Checksol(NumStorage, ExprsStorage, count + 1, target)) {
                 return true;
             }
 
@@ -72,7 +147,7 @@ bool Check(double problem[], string expression[], int n) {
             if(abs(b) > verysmall) {
                 NumStorage[count] = a / b;
                 ExprsStorage[count] = "(" + ea + "/" + eb + ")";
-                if (Check(NumStorage, ExprsStorage, count + 1)) {
+                if (Checksol(NumStorage, ExprsStorage, count + 1, target)) {
                     return true;
                 }
             }
@@ -81,7 +156,7 @@ bool Check(double problem[], string expression[], int n) {
     return false;
 }
 
-bool Solve24game(double problem[]) {
+bool Solvethegame(double problem[], int target) {
     string exprs[4];
 
     sort(problem, problem + 4);
@@ -93,7 +168,7 @@ bool Solve24game(double problem[]) {
         exprs[i] = to_string((int)problem[i]);
     }
 
-        if(Check(problem, exprs, 4)) {
+        if(Checksol(problem, exprs, 4, target)) {
             return true;
         }
     } while(next_permutation(problem, problem + 4));
@@ -101,11 +176,61 @@ bool Solve24game(double problem[]) {
     return false;
 }
 
-int main() {
-    //test case
-    double arr1[4] = {0,1,9,2};
+void createList (int target) {
+    ifstream source;
+    ofstream dest("list.txt");
+    source.open("num.txt");
+    string n;
+    int count = 0;
+    while(getline(source, n)) {
+        count++;
+        vector<double> prob;
+        for (int i = 0; i < 4 ; i++) {
+            prob.push_back((double)(n[i] - '0'));
+        }
 
-    if (!Solve24game(arr1)) {
-        cout << "This problem is not solvable" << endl;
+        double* arr = prob.data();
+
+        if (check(arr, 4, target)) {
+            dest << count << "\n";
+        }
     }
+    source.close();
+    dest.close();
+}
+
+string getfile(string num, string list) {
+    ifstream l;
+    l.open(list);
+    string listString;
+    vector<int> line;
+
+    while (getline(l, listString)) {
+        int num = stoi(listString);
+        line.push_back(num);
+
+    }
+
+    int target = line[rand() % line.size()];
+    int count = 0;
+
+    ifstream q;
+    q.open(num);
+    string numSting;
+
+    while (getline(q, numSting)) {
+        count++;
+        if(count == target) {
+            return numSting;
+        }
+    }
+    l.close();
+    q.close();
+    return "";
+}
+
+int main() {
+    srand(time(0));
+    createList(67);
+    cout << getfile("num.txt","list.txt");
 }
