@@ -1,9 +1,11 @@
 #include "GameUi.h"
 
 void GameSystem24(string);
-void ScoreBoard(int[]);
+void ScoreBoard(int data[], int data_n);
 void Menu();
 
+sf::Texture texture("Images/Background.jpg");
+sf::Sprite sprite(texture);
 sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name'
 
 enum GameState { // state of game to process more easily
@@ -16,12 +18,24 @@ GameState state = MENU;
 
 int main()
 {    
-    
+    texture.setSmooth(true);
+    if (!texture.loadFromFile("Images/Background.jpg"))
+    {
+    return -1;
+    }
+    // Optional: Set the position to (0, 0) (default) and scale the sprite to the window size if needed
+    sprite.setPosition({0, 0});
+    sprite.setScale({800.f / texture.getSize().x, 800.f / texture.getSize().y});
+    window.setFramerateLimit(90);
+
     while (window.isOpen())
     {
         if (state == MENU){Menu();}
         if (state == GAME24){GameSystem24("9423");}
-        if (state == SCORE_BOARD){ScoreBoard(new int[4]{10, 20, 30, 40});}
+        if (state == SCORE_BOARD){
+            int data[] = {10, 20, 15, 5}; // Example data for the bar chart
+            ScoreBoard(data, 4);
+        }
     }
     
 }
@@ -40,20 +54,20 @@ void Menu(){
         .X = 5,
         .Y = 0,
         .name = "Game24",
-        .ColorBox = sf::Color(255,0,0)
+        .ColorBox = sf::Color(0,51,102)
     };
 
     // buttonN
     buttonBuild buttonN = buttonBuild{
         .posBox_x = windowSize_x*3/4,
-        .posBox_y = WindowSize_y/(2.f), // 2.5 when no float was assian as double type
+        .posBox_y = WindowSize_y/(2.f), // 2.5 when dno float was assian as double type
         .FontSize = 50,
         .buttonSize_x = 225,
         .buttonSize_y = 100,
         .X = 5,
         .Y = 0,
         .name = "Random",
-        .ColorBox = sf::Color(0,250,0)
+        .ColorBox = sf::Color(0,51,102)
     };
 
     // buttonN
@@ -66,7 +80,7 @@ void Menu(){
         .X = 5,
         .Y = 0,
         .name = "Score",
-        .ColorBox = sf::Color(0,250,0)
+        .ColorBox = sf::Color(0,51,102)
     };
     
     sf:: RectangleShape button_24 = button24.builtButton();
@@ -122,6 +136,7 @@ void Menu(){
                 }
             } 
             // windown.draw is order by line to line upper = under
+            window.draw(sprite);
             window.draw(tilte.TitleName());
             window.draw(button_24);
             window.draw(button_N);
@@ -417,23 +432,23 @@ void GameSystem24(string setNumber){
     }   
 }
 
-void ScoreBoard(int data[]){
+void ScoreBoard(int data[], int data_n){
     Screen Display;
-    buttonBuild Back_Button = {
-        .posBox_x = windowSize_x*0,
-        .posBox_y = WindowSize_y*0, // 2.5 when no float was assian as double type
-        .FontSize = 75,
-        .buttonSize_x = 150,
-        .buttonSize_y = 150,
-        .X = 0,
-        .Y = 0,
-        .name = "Back",
-            .ColorBox = sf::Color::White
+    Circle_buttonBuild GetBack = { // cic
+            .posBox_x = 25,
+            .posBox_y = 25, // 2.5 when no float was assian as double type
+            .FontSize = 20,
+            .Radius = 25,
+            .PointinCircle = 100,
+            .X = 0,
+            .Y = 0,
+            .name = "Icon",
+            .ColorBox = sf::Color(255,20,52)
         };
-    sf::RectangleShape Back_Button_Rect = Back_Button.builtButton();
+    sf::CircleShape Back_Button_Rect = GetBack.Circle_builtButton();
         while (state == SCORE_BOARD){
             window.clear();
-            Bar_Chart(window, data, 4);
+            Bar_Chart(window, data, data_n);
             window.draw(Back_Button_Rect);
            
             while (const std::optional event = window.pollEvent()) // Closing windows functions
@@ -448,7 +463,7 @@ void ScoreBoard(int data[]){
                         state = MENU;
                     }
                 }else{
-                    Back_Button_Rect.setFillColor(Back_Button.ColorBox); 
+                    Back_Button_Rect.setFillColor(GetBack.ColorBox); 
                 }
             }
              window.display();
