@@ -13,6 +13,7 @@
 using namespace std;
 
 const double verysmall = 1e-9;
+set<string> Allpossiblesolutions;
 
 bool check(double prob[], int n, int target) {
     if(n == 1) {
@@ -84,14 +85,10 @@ bool permutationforcheck (double prob[], int target) {
     return false;
 }
 
-bool Checksol(double problem[], string expression[], int n, int target) {
+void Checksol(double problem[], string expression[], int n, int target) {
     if(n == 1) {
         if (abs(problem[0] - target) < verysmall) {
-            cout << "Solution: " << expression[0] << " = " << target <<endl;
-            return true;
-        }
-        else {
-            return false;
+            Allpossiblesolutions.insert(expression[0]);
         }
     }
 
@@ -124,42 +121,30 @@ bool Checksol(double problem[], string expression[], int n, int target) {
             NumStorage[count] = a + b;
             ExprsStorage[count] = "(" + ea + "+" + eb + ")";
             // count + 1 เพื่อให้เป็นเลข 3
-            if (Checksol(NumStorage, ExprsStorage, count + 1, target)) {
-                return true;
-            }
+            Checksol(NumStorage, ExprsStorage, count + 1, target);
 
             // -
-
             NumStorage[count] = a - b;
             ExprsStorage[count] = "(" + ea + "-" + eb + ")";
-            if (Checksol(NumStorage, ExprsStorage, count + 1, target)) {
-                return true;
-            }
+            Checksol(NumStorage, ExprsStorage, count + 1, target);
 
             // *
-
             NumStorage[count] = a * b;
             ExprsStorage[count] = "(" + ea + "*" + eb + ")";
-            if (Checksol(NumStorage, ExprsStorage, count + 1, target)) {
-                return true;
-            }
+            Checksol(NumStorage, ExprsStorage, count + 1, target);
 
             // /
-
             //เช็กกับ verysmall ดีกว่า abs(b) != 0
             if(abs(b) > verysmall) {
                 NumStorage[count] = a / b;
                 ExprsStorage[count] = "(" + ea + "/" + eb + ")";
-                if (Checksol(NumStorage, ExprsStorage, count + 1, target)) {
-                    return true;
-                }
+                Checksol(NumStorage, ExprsStorage, count + 1, target);
             }
         }
     }
-    return false;
 }
 
-bool Solvethegame(double problem[], int target) {
+void Solvethegame(double problem[], int target) {
     string exprs[4];
 
     sort(problem, problem + 4);
@@ -171,12 +156,13 @@ bool Solvethegame(double problem[], int target) {
         exprs[i] = to_string((int)problem[i]);
     }
 
-        if(Checksol(problem, exprs, 4, target)) {
-            return true;
-        }
+        Checksol(problem, exprs, 4, target);
+
     } while(next_permutation(problem, problem + 4));
-    
-    return false;
+
+    for (const string& s : Allpossiblesolutions) {
+        cout << s << endl;
+    }
 }
 
 void createList (int target = 24) {
