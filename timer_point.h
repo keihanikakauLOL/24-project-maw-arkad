@@ -1,11 +1,11 @@
 #ifndef GAME_H
 #define GAME_H
+
 #include <iostream>
 #include <thread>
 #include <atomic>
 #include <chrono>
 #include <string>
-using namespace std;
 
 class Game {
 private:
@@ -21,7 +21,7 @@ private:
 
     std::thread t1, t2, t3;
 
-    inline void timer() {
+    void timer() {
         while (runaway) {
 
             if (running && !paused && timeLeft > 0) {
@@ -40,7 +40,7 @@ private:
         }
     }
 
-    inline void pointSystem() {
+    void pointSystem() {
         while (runaway) {
 
             if (running && answeredCorrect) {
@@ -55,7 +55,7 @@ private:
         }
     }
 
-    inline void endGame() {
+    void endGame() {
         while (runaway) {
 
             if (running && timeout) {
@@ -73,7 +73,7 @@ private:
         }
     }
 
-    inline void resetGame() {
+    void resetGame() {
         timeLeft = 20;
         score = 0;
         streak = 1;
@@ -83,59 +83,53 @@ private:
     }
 
 public:
-    inline void pauseTimer() {
+    void start() {
+        t1 = std::thread(&Game::timer, this);
+        t2 = std::thread(&Game::pointSystem, this);
+        t3 = std::thread(&Game::endGame, this);
+    }
+
+    void handleCommand(const std::int& cmd) {
+
+        if (cmd == 0) addPoint();
+        else if (cmd == 1) pauseTimer();
+        else if (cmd == 2) resumeTimer();
+        else if (cmd == 3) restart();
+        else if (cmd == 4) quit();
+    }
+
+    void pauseTimer() {
         if (!paused && running) {
             paused = true;
             std::cout << "\nPaused\n";
         }
     }
 
-    inline void resumeTimer() {
+    void resumeTimer() {
         if (paused && running) {
             paused = false;
             std::cout << "\nResumed\n";
         }
     }
 
-    inline void addPoint() {
+    void addPoint() {
         if (running)
             answeredCorrect = true;
     }
 
-    inline void restart() {
+    void restart() {
         restartFlag = true;
     }
 
-    inline void quit() {
+    void quit() {
         runaway = false;
         running = false;
     }
 
-    inline void start() {
-
-        std::cout << "Game Started!\n";
-        std::cout << "Commands: correct | pause | resume | restart | quit\n";
-
-        t1 = std::thread(&Game::timer, this);
-        t2 = std::thread(&Game::pointSystem, this);
-        t3 = std::thread(&Game::endGame, this);
-
-        std::string cmd;
-
-        while (runaway) {
-
-            std::cin >> cmd;
-
-            if (cmd == "correct") addPoint();
-            else if (cmd == "pause") pauseTimer();
-            else if (cmd == "resume") resumeTimer();
-            else if (cmd == "restart") restart();
-            else if (cmd == "quit") quit();
-        }
-
-        t1.join();
-        t2.join();
-        t3.join();
+    void wait() {
+        if (t1.joinable()) t1.join();
+        if (t2.joinable()) t2.join();
+        if (t3.joinable()) t3.join();
 
         std::cout << "\nFinal Score: " << score << "\n";
     }
