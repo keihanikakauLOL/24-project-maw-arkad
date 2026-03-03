@@ -5,6 +5,7 @@
 #include <sstream>
 #include <algorithm>
 #include <map>
+#include <unistd.h>
 
 using namespace std;
 
@@ -57,7 +58,7 @@ sf::RectangleShape buttonBuild::builtButton(){
 };
 
 
-sf:: Text buttonBuild::txtBox(sf::Vector2f buttonCenter){
+sf::Text buttonBuild::txtBox(sf::Vector2f buttonCenter){
     sf::Text Text(font,name,FontSize); 
     sf::FloatRect bounds = Text.getLocalBounds();
     Text.setOrigin({bounds.position.x+bounds.size.x/2,FontSize-bounds.position.y});
@@ -67,6 +68,32 @@ sf:: Text buttonBuild::txtBox(sf::Vector2f buttonCenter){
     return Text;
 }
 /// ////////////////////////////////
+class Pause{
+    string word;
+    int FontSize;
+    float posX;
+    float posY;
+    public:
+        Pause(string,int,float,float);
+        sf::Text showText();
+};
+
+Pause::Pause(string w,int i,float x ,float y){
+    word = w;
+    FontSize = i;
+    posX = x;
+    posY = y;
+}
+
+sf::Text Pause::showText(){
+    sf::Text TextPause(font,word,FontSize);
+    sf::FloatRect bounds = TextPause.getLocalBounds();
+    TextPause.setOrigin({bounds.position.x+bounds.size.x/2,FontSize-bounds.position.y});
+    TextPause.setPosition({posX,posY});
+    TextPause.setOutlineColor(sf::Color::Black);
+    TextPause.setOutlineThickness(2.f);
+    return TextPause;
+}
 
 class Screen{
    
@@ -79,10 +106,14 @@ class Screen{
         sf::Text printData();
         sf::RectangleShape BoxScreen();
         int Get_size();
+        string GetData();
         void dataReset();
         void Calculate();
 };
 
+string Screen::GetData(){
+    return dataStr;
+}
 
 void Screen::Calculate(){
     if (Data.size() == 2){
