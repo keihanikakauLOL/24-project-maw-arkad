@@ -18,14 +18,18 @@ private:
     std::atomic<int> timeLeft{30};
     std::atomic<int> score{0};
     std::atomic<int> scoremax{0};
-    std::atomic<int> streak{1};
-    std::atomic<int> streakmax{1};
+    std::atomic<int> streak{0};
+    std::atomic<int> streakmax{0};
     std::atomic<bool> running{true};
     std::atomic<bool> runaway{true};
     std::atomic<bool> paused{false};
     std::atomic<bool> answeredCorrect{false};
+    std::atomic<bool> answeredWrong{false};
     std::atomic<bool> timeout{false};
     std::atomic<bool> restartFlag{false};
+    std::atomic<const int> base_score {5};
+    std::atomic<const int> streak_base {3};
+    std::atomic<int> received_score{0};
 
     std::thread t1, t2, t3;
 
@@ -46,23 +50,60 @@ private:
         }
     }
 
-    void pointSystem() {
+    //void pointSystem() {
+        //while (runaway) {
+            //if (running && answeredCorrect) {
+                //score += 10 * streak;
+                //streak++;
+                //answeredCorrect = false;
+                //if (score.load() > scoremax.load()) {
+                //    scoremax.store(score.load());
+                //}
+                //if (streak.load() > streakmax.load()) {
+                //    streakmax.store(streak.load());
+                //}
+            //}
+            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        //}
+    //}
+     void streakTrack() {
         while (runaway) {
+            // Handle correct answer
             if (running && answeredCorrect) {
-                score += 10 * streak;
                 streak++;
-                answeredCorrect = false;
+                if (streak >= streak_base) {
+                    if (streak > streakmax.load()) {
+                        streakmax.store(streak.load());
+                    }
+                    received_score = base_score +(base_score * (streak/10));
+                    std::cout << "\nCorrect! Streak: " << streak << std::endl;
+                    std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
+                } else {
+                    received_score = base_score;
+                    std::cout << "\nCorrect!" << std::endl;
+                    std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
+                }
+                
+                score += received_score;
+                
                 if (score.load() > scoremax.load()) {
                     scoremax.store(score.load());
                 }
-                if (streak.load() > streakmax.load()) {
-                    streakmax.store(streak.load());
-                }
+                
+                answeredCorrect = false;
             }
+            
+            // Handle wrong answer
+            if (running && answeredWrong) {
+                streak = 0;
+                std::cout << "\nWrong! Streak reset." << std::endl;
+                std::cout << "Total score: " << score << std::endl;
+                answeredWrong = false;
+            }
+            
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
-
     void endGame() {
         while (runaway) {
             if (running && timeout) {
@@ -70,6 +111,7 @@ private:
                 std::cout << "\nFinal Score: " << score << "\n";
                 running = false;
                 timeout = false;
+                streak = 0;
             }
 
             if (restartFlag) {
@@ -93,7 +135,7 @@ public:
 
     void start() {
         t1 = std::thread(&Game::timer, this);
-        t2 = std::thread(&Game::pointSystem, this);
+        t2 = std::thread(&Game::streakTrack, this);
         t3 = std::thread(&Game::endGame, this);
     }
 
@@ -147,7 +189,11 @@ public:
             answeredCorrect = true;
         }
     }
-
+    void wrongAnswer() {
+        if (running && !paused) {
+            answeredWrong = true;
+        }
+    }
     void restart() {
         restartFlag = true;
     }
