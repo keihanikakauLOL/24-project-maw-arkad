@@ -161,7 +161,7 @@ void Solvethegame(double problem[], int target) {
     } while(next_permutation(problem, problem + 4));
 
     for (const string& s : Allpossiblesolutions) {
-        cout << s << endl;
+        cout << "\"" << s << "\"" << "," << endl;
     }
 }
 
@@ -200,7 +200,7 @@ void createList (int target = 24) {
 
 string getfile() {
     static vector<int> index;
-    static size_t current = 0;
+    static int current = 0;
     static bool is_loaded = false;
 
     const string list = "list.txt";
