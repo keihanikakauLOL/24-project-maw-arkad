@@ -17,7 +17,9 @@ public:
 private:
     std::atomic<int> timeLeft{30};
     std::atomic<int> score{0};
+    std::atomic<int> scoremax{0};
     std::atomic<int> streak{1};
+    std::atomic<int> streakmax{1};
     std::atomic<bool> running{true};
     std::atomic<bool> runaway{true};
     std::atomic<bool> paused{false};
@@ -49,7 +51,13 @@ private:
             if (running && answeredCorrect) {
                 score += 10 * streak;
                 streak++;
-                answeredCorrect = false; 
+                answeredCorrect = false;
+                if (score.load() > scoremax.load()) {
+                    scoremax.store(score.load());
+                }
+                if (streak.load() > streakmax.load()) {
+                    streakmax.store(streak.load());
+                }
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
