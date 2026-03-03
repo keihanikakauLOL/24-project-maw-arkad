@@ -5,9 +5,15 @@
 #include <thread>
 #include <atomic>
 #include <chrono>
-#include <string>
 
 class Game {
+public:
+    struct GameState {
+        int score;
+        int streak;
+        int timeLeft;
+    };
+
 private:
     std::atomic<int> timeLeft{30};
     std::atomic<int> score{0};
@@ -21,46 +27,39 @@ private:
 
     std::thread t1, t2, t3;
 
-    int timer() {
+
+    void timer() {
         while (runaway) {
-
             if (running && !paused && timeLeft > 0) {
-
-                std::cout << "\rTime Left: "
-                          << timeLeft << " sec   " << std::flush;
-
+                std::cout << "\r[Time Left: " << timeLeft << "s] " << std::flush;
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 timeLeft--;
-                return timeLeft.load();
 
-                if (timeLeft == 0)
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
                     timeout = true;
+                }
             }
-
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     }
 
     void pointSystem() {
         while (runaway) {
-
             if (running && answeredCorrect) {
                 score += 10 * streak;
                 streak++;
-                answeredCorrect = false;
-
-                std::cout << "\nScore: " << score << "\n";
+                answeredCorrect = false; 
             }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 
     void endGame() {
         while (runaway) {
- 
             if (running && timeout) {
-                std::cout << "\n\nTime's up!\n";
+                std::cout << "\n\n--- TIME'S UP! ---";
+                std::cout << "\nFinal Score: " << score << "\n";
                 running = false;
                 timeout = false;
             }
@@ -69,7 +68,6 @@ private:
                 resetGame();
                 restartFlag = false;
             }
-
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     }
@@ -80,53 +78,66 @@ private:
         streak = 1;
         paused = false;
         running = true;
-        std::cout << "\nGame Restarted!\n";
+        std::cout << "\n--- Game Restarted! ---\n";
     }
 
 public:
+
     void start() {
         t1 = std::thread(&Game::timer, this);
         t2 = std::thread(&Game::pointSystem, this);
         t3 = std::thread(&Game::endGame, this);
     }
 
-    void choice_func(const std::int& cmd) {
 
+    GameState ChooseYourChoice() {
+        paused = true;
+        GameState state;
+        state.score = score.load();
+        state.streak = streak.load();
+        state.timeLeft = timeLeft.load();
+        return state;
+    }
+
+    GameState choice_func(int cmd) {
         if (cmd == 0) {
-            addPoint();
-            Chooseyourchoicemyfriend();
+            addPoint(); 
+            return ChooseYourChoice(); 
         }
         else if (cmd == 1) pauseTimer();
         else if (cmd == 2) resumeTimer();
         else if (cmd == 3) restart();
         else if (cmd == 4) quit();
+
+        GameState current;
+        current.score = score.load();
+        current.streak = streak.load();
+        current.timeLeft = timeLeft.load();
+        return current;
     }
 
-    int Chooseyourchoicemyfriend(){
-        paused = true;
-        return streak.load();
-        return score.load();
+    int getTimeLeft() const {
         return timeLeft.load();
-        timeLeft = 30;
     }
 
     void pauseTimer() {
         if (!paused && running) {
             paused = true;
-            std::cout << "\nPaused\n";
+            std::cout << "\n[Game Paused]\n";
         }
     }
 
     void resumeTimer() {
         if (paused && running) {
             paused = false;
-            std::cout << "\nResumed\n";
+            std::cout << "\n[Game Resumed]\n";
         }
     }
 
     void addPoint() {
-        if (running)
+        if (running && !paused) {
             answeredCorrect = true;
+        }
     }
 
     void restart() {
@@ -142,8 +153,10 @@ public:
         if (t1.joinable()) t1.join();
         if (t2.joinable()) t2.join();
         if (t3.joinable()) t3.join();
-
-        std::cout << "\nFinal Score: " << score << "\n";
+    }
+    
+    bool isRunning() const {
+        return running;
     }
 };
 
