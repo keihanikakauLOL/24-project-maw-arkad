@@ -1,13 +1,15 @@
 #include "GameUi.h"
 
 void GameSystem24();
-void ScoreBoard(int data[], int data_n);
+void ScoreBoard(const map<string, int>& data);
 void Menu();
 
 bool inGame24 = 0;
 sf::Texture texture("Images/Background.jpg");
+sf::Texture texture_win("Images/Winnig2.jpg");
 sf::Sprite sprite(texture);
-sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name'
+sf::Sprite sprite_win(texture_win);
+sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name' tit?
 
 enum GameState { // state of game to process more easily
     MENU,
@@ -24,7 +26,6 @@ int main()
     {
     return -1;
     }
-    // Optional: Set the position to (0, 0) (default) and scale the sprite to the window size if needed
     sprite.setPosition({0, 0});
     sprite.setScale({800.f / texture.getSize().x, 800.f / texture.getSize().y});
     window.setFramerateLimit(144);
@@ -36,8 +37,15 @@ int main()
             if (state == MENU){Menu();}
             if (state == GAME24){GameSystem24();}
             if (state == SCORE_BOARD){
-                int data[] = {10, 20, 15, 5}; // Example data for the bar chart
-                ScoreBoard(data, 4);
+                map<string, int> data = {
+                    {"MING", 100},
+                    {"THIW", 20},
+                    {"SHO", 15},
+                    {"ARM", 25},
+                    {"PUPP", 5}
+                };
+
+                ScoreBoard(data);
             }
         }
     }
@@ -262,7 +270,7 @@ void GameSystem24(){
             .PointinCircle = 100,
             .X = 0,
             .Y = 0,
-            .name = "Icon",
+            .name = "",
             .ColorBox = sf::Color(255,20,52)
         };
     sf::RectangleShape number_1 = number1.builtButton();
@@ -292,6 +300,7 @@ void GameSystem24(){
         //
         window.draw(Get_Back);
         window.draw(GetBack.Circle_txtBox(Get_Back.getPosition()));
+        drawBackArrow(window, {25, 25}, 1.f, sf::Color::White); // draw back icon
         //
         window.draw(dele);
         window.draw(del.Circle_txtBox(dele.getPosition()));
@@ -428,7 +437,9 @@ void GameSystem24(){
     }
 }
 
-void ScoreBoard(int data[], int data_n){
+void ScoreBoard(const map<string, int>& data){
+    sprite_win.setPosition({0, 0});
+    sprite_win.setScale({800.f / texture_win.getSize().x, 800.f / texture_win.getSize().y});
     Screen Display;
     Circle_buttonBuild GetBack = { // cic
             .posBox_x = 25,
@@ -445,9 +456,11 @@ void ScoreBoard(int data[], int data_n){
         while (state == SCORE_BOARD){
             auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
             window.clear();
-            Bar_Chart(window, data, data_n);
+            window.draw(sprite_win);
+            Bar_Chart(window, data);
             window.draw(Back_Button_Rect);
-            // "close requested" event: we close the window 
+            drawBackArrow(window, {25, 25}, 1.f, sf::Color::White); // draw back icon
+
             if (Back_Button_Rect.getGlobalBounds().contains(mouse_pos)) 
             {
                 Back_Button_Rect.setFillColor(sf::Color(44,75,22)); 
