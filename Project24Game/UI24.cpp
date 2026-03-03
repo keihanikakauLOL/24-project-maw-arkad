@@ -1,12 +1,13 @@
 #include "GameUi.h"
 #include "24GameAlgo.h"
+// #include "timer_point.h"
 
 void GameSystem24();
 void ScoreBoard(const map<string, int>& data);
 void Menu();
 void Round(string,string);
 void pauseScreen();
-
+// Game stat;
 bool inGame24 = 0;
 sf::Texture texture("Images/Background.jpg");
 sf::Texture texture_win("Images/Winnig2.jpg");
@@ -172,16 +173,25 @@ void GameSystem24(){
     int type_games = 24;
     createList(type_games);
     string goal = to_string(type_games)+".00";
+    
     while (state == GAME24){ 
         gameOn = InRound24; // for debug change to in InRound24
-        string setNumber = getfile(); // random
+        string setNumber = "1194"; // random
+        // stat.start();
         Round(setNumber,goal);
+        // stat.pauseTimer(); // 1 1 9 4
         usleep(11000);
         pauseScreen();
     }
 }
 
-void Round(string setNumber,string goal){
+void Round(string setNumberString,string goal){ // time 
+    double setNumber[4];
+    vector<string> setNumberStr;
+    for (int i = 0 ;i < setNumberString.size(); i++){
+        setNumberStr.push_back(to_string(setNumberString[i]-48));
+        setNumber[i] = (double)setNumberString[i]-48;
+    }
     Screen Display;
     bool gateway[] = {0,0,0,0};
     bool hasDel = 0;
@@ -193,8 +203,8 @@ void Round(string setNumber,string goal){
         .buttonSize_y = 150,
         .X = 0,
         .Y = 0,
-        .name = to_string(setNumber[0]-48),
-            .ColorBox = sf::Color(255,20,52)
+        .name = setNumberStr[0],
+        .ColorBox = sf::Color(255,20,52)
         };
     buttonBuild number2 = {
             .posBox_x = windowSize_x*50/100,
@@ -204,7 +214,7 @@ void Round(string setNumber,string goal){
             .buttonSize_y = 150,
             .X = 0,
             .Y = 0,
-            .name = to_string(setNumber[1]-48),
+            .name = setNumberStr[1],
             .ColorBox = sf::Color(255,20,52)
         };
     buttonBuild number3 = {
@@ -215,7 +225,7 @@ void Round(string setNumber,string goal){
             .buttonSize_y = 150,
             .X = 0,
             .Y = 0,
-            .name = to_string(setNumber[2]-48),
+            .name = setNumberStr[2],
             .ColorBox = sf::Color(255,20,52)
         };
     buttonBuild number4 = {
@@ -226,9 +236,13 @@ void Round(string setNumber,string goal){
             .buttonSize_y = 150,
             .X = 0,
             .Y = 0,
-            .name = to_string(setNumber[3]-48),
+            .name = setNumberStr[3],
             .ColorBox = sf::Color(255,20,52)
         };
+    sf::RectangleShape number_1 = number1.builtButton();
+    sf::RectangleShape number_2 = number2.builtButton();
+    sf::RectangleShape number_3 = number3.builtButton();
+    sf::RectangleShape number_4 = number4.builtButton();
     Circle_buttonBuild plus = { //cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*40/100, // 2.5 when no float was assian as double type
@@ -295,10 +309,6 @@ void Round(string setNumber,string goal){
             .name = "",
             .ColorBox = sf::Color(255,20,52)
         };
-    sf::RectangleShape number_1 = number1.builtButton();
-    sf::RectangleShape number_2 = number2.builtButton();
-    sf::RectangleShape number_3 = number3.builtButton();
-    sf::RectangleShape number_4 = number4.builtButton();
     sf::CircleShape Plus = plus.Circle_builtButton(); 
     sf::CircleShape Minu = minu.Circle_builtButton(); 
     sf::CircleShape Mul = mul.Circle_builtButton(); 
@@ -306,6 +316,10 @@ void Round(string setNumber,string goal){
     sf::CircleShape Get_Back = GetBack.Circle_builtButton(); 
     sf::CircleShape dele = del.Circle_builtButton(); 
     while (gameOn == InRound24){
+        number1.name = setNumberStr[0];
+        number2.name = setNumberStr[1];
+        number3.name = setNumberStr[2];
+        number4.name = setNumberStr[3];
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
         window.clear(); 
         window.draw(number_1);
@@ -349,21 +363,22 @@ void Round(string setNumber,string goal){
                 number_1.setFillColor(sf::Color(44,75,22)); 
                 if (gateway[0] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                     gateway[0] = 1;
-                    Display.add(setNumber[0]);
+                    Display.add(setNumber[0],0);
                     Display.NumAllowed = 0;
                 }
             }else{
-                number_1.setFillColor(number1.ColorBox); 
+                number_1.setFillColor(number1.ColorBox);
             }
             if (number_2.getGlobalBounds().contains(mouse_pos))
             {
                 number_2.setFillColor(sf::Color(44,75,22)); 
                 if (gateway[1] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                     gateway[1] = 1;
-                    Display.add(setNumber[1]); 
+                    Display.add(setNumber[1],1); 
                     Display.NumAllowed = 0;
                 }
                 }else{
+                    if (gateway[1] == 1){number_1.setFillColor(sf::Color::Blue);}
                     number_2.setFillColor(number2.ColorBox);
                 }
                 if (number_3.getGlobalBounds().contains(mouse_pos)) 
@@ -371,20 +386,22 @@ void Round(string setNumber,string goal){
                     number_3.setFillColor(sf::Color(44,75,22)); 
                     if (gateway[2] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         gateway[2] = 1;
-                        Display.add(setNumber[2]);
+                        Display.add(setNumber[2],2);
                         Display.NumAllowed = 0;
                     }
                 }else{
+                    if (gateway[2] == 1){number_1.setFillColor(sf::Color::Blue);}
                     number_3.setFillColor(number3.ColorBox); 
                 }
                 if (number_4.getGlobalBounds().contains(mouse_pos)){
                     number_4.setFillColor(sf::Color(44,75,22));
                     if (gateway[3] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                         gateway[3] = 1;
-                        Display.add(setNumber[3]);
+                        Display.add(setNumber[3],3);
                         Display.NumAllowed = 0;
                     }
                 }else{
+                    if (gateway[3] == 1){number_1.setFillColor(sf::Color::Blue);}
                     number_4.setFillColor(number4.ColorBox); 
                 }
             }
@@ -441,21 +458,31 @@ void Round(string setNumber,string goal){
             Get_Back.setFillColor(sf::Color(44,75,22)); 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                 window.clear();
+                // stat.quit();
                 state = MENU;
                 gameOn = NotInGame;
+                
             }
         }
-            ////////////////////////////////////////////////
         Display.Calculate();
+        if (Display.Order.size() == 2)
+        {
+            setNumber[Display.indexMustChage] = Display.newData;
+            setNumberStr[Display.indexMustChage] = Display.newDataStr;
+            gateway[Display.indexMustChage] = 0;
+            usleep(80000);
+            cout << Display.indexMustChage;
+            Display.OrderClear();
+            Display.NumAllowed = 1;
+        }
         window.draw(Display.printData());
         window.display();
     }
 }
 
 
-void pauseScreen(){ // add steak // time // score
+void pauseScreen(){ // add steak  // score
     Pause TitlePause("PauseTime",100,windowSize_x/2,100);
-    Pause TimeShow("02.00",60,windowSize_x*2/10,WindowSize_y*4/10);
     Pause StreakShow("Streak",60,windowSize_x*8/10,WindowSize_y*4/10);
     Pause ScoreShow("Score",60,windowSize_x*5/10,WindowSize_y*6/10);
     buttonBuild GoNext = buttonBuild{
@@ -477,7 +504,6 @@ void pauseScreen(){ // add steak // time // score
         window.draw(buttonGo);
         window.draw(GoNext.txtBox(buttonGo.getGeometricCenter()));
         window.draw(TitlePause.showText());
-        window.draw(TimeShow.showText());
         window.draw(StreakShow.showText());
         window.draw(ScoreShow.showText());
         if (buttonGo.getGlobalBounds().contains(mouse_pos)){
