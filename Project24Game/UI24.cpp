@@ -171,7 +171,6 @@ void Menu(){
 
 void GameSystem24(){
     int type_games = 24;
-    createList(type_games);
     string goal = to_string(type_games)+".00";
     
     while (state == GAME24){ 

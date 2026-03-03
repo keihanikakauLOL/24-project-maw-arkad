@@ -204,12 +204,3 @@ string newGetfile() {
     count++;
     return combination[shuff[count]];
 }
-
-int main() {
-    createQuestions();
-    newCreateList();
-    int i = 466;
-    while(i--) {
-        cout << newGetfile() << endl;
-    }
-}
