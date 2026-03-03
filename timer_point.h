@@ -21,7 +21,7 @@ private:
 
     std::thread t1, t2, t3;
 
-    void timer() {
+    int timer() {
         while (runaway) {
 
             if (running && !paused && timeLeft > 0) {
@@ -31,6 +31,7 @@ private:
 
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 timeLeft--;
+                return timeLeft.load();
 
                 if (timeLeft == 0)
                     timeout = true;
@@ -57,7 +58,7 @@ private:
 
     void endGame() {
         while (runaway) {
-
+ 
             if (running && timeout) {
                 std::cout << "\n\nTime's up!\n";
                 running = false;
@@ -102,11 +103,11 @@ public:
     }
 
     int Chooseyourchoicemyfriend(){
-        running = false;
+        paused = true;
         return streak.load();
         return score.load();
         return timeLeft.load();
-        timeLeft = 0;
+        timeLeft = 30;
     }
 
     void pauseTimer() {
