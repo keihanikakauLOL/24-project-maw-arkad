@@ -14,6 +14,9 @@ using namespace std;
 
 const double verysmall = 1e-9;
 set<string> Allpossiblesolutions;
+vector<int> list;
+vector<int> shuff;
+vector<string> combination;
 
 bool check(double prob[], int n, int target) {
     if(n == 1) {
@@ -165,75 +168,48 @@ void Solvethegame(double problem[], int target) {
     }
 }
 
-void createList (int target = 24) {
-    ifstream source;
-    ofstream dest("list.txt");
-    source.open("num.txt");
-    string n;
-    vector <int> shuff;
-    int count = 0;
-    while(getline(source, n)) {
-        count++;
-        vector<double> prob;
-        for (int i = 0; i < 4 ; i++) {
-            prob.push_back((double)(n[i] - '0'));
+void createQuestions() {
+    for (int a = 0; a <= 9; a++) {
+        for (int b = a; b <= 9; b++) {
+            for (int c = b; c <= 9; c++) {
+                for (int d = c; d <= 9; d++) {
+                    string temp = to_string(a) + to_string(b) + to_string(c) + to_string(d);
+                    combination.push_back(temp);
+                }
+            }
         }
+    }
+}
 
-        double* arr = prob.data();
-
+void newCreateList(int target = 24) {
+    double arr[4];
+    for (int i = 0; i <= 714; i++) {
+        for (int j = 0; j < 4; j++) {
+            string temp = combination[i];
+            arr[j] = (temp[j] - '0');
+        }
         if (check(arr, 4, target)) {
-            shuff.push_back(count);
-        }
+                shuff.push_back(i);
+            }
     }
 
     random_device rd;
     mt19937 g(rd());
     shuffle(shuff.begin(), shuff.end(), g);
 
-    for (int i = 0; i < shuff.size(); i++) {
-        dest << shuff[i] << endl;
-    }
-
-    source.close();
-    dest.close();
 }
 
-string getfile() {
-    static vector<int> index;
-    static size_t current = 0;
-    static bool is_loaded = false;
+string newGetfile() {
+    static int count = -1;
+    count++;
+    return combination[shuff[count]];
+}
 
-    const string list = "list.txt";
-    const string num = "num.txt";
-
-    // 2. โหลด Index เข้า Vector (ทำแค่ครั้งแรกที่เรียกฟังก์ชัน)
-    if (!is_loaded) {
-        ifstream idxFile(list);
-        string val;
-        while (getline(idxFile, val)) {
-            index.push_back(stoi(val));
-        }
-        is_loaded = true;
+int main() {
+    createQuestions();
+    newCreateList();
+    int i = 466;
+    while(i--) {
+        cout << newGetfile() << endl;
     }
-
-
-    // 4. อ่านไฟล์ข้อมูลตาม Index ปัจจุบัน
-    ifstream file(num);
-    string line;
-    int target = index[current];
-    int line_num = 0;
-    bool found = false;
-    string result;
-
-    current++;
-
-    while (getline(file, line)) {
-        line_num++;
-        if (line_num == target) {
-            result = line;
-            found = true;
-            break;
-        }
-    }
-    return result;
 }
