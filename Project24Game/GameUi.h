@@ -22,7 +22,7 @@ class buttonBuild{
         float buttonSize_x;
         float buttonSize_y;
         float X;
-        float Y;
+        float Y; 
         string name;
         sf::Color ColorBox;
         sf::RectangleShape builtButton(); 
@@ -67,6 +67,8 @@ sf::Text buttonBuild::txtBox(sf::Vector2f buttonCenter){
     Text.setOutlineThickness(2.f);
     return Text;
 }
+
+
 /// ////////////////////////////////
 class Pause{
     string word;
@@ -101,44 +103,51 @@ class Screen{
     string dataStr = "";
     char OpRn;
     public: 
+        vector<int>Order;
+        string newDataStr;
+        double newData;
+        int indexMustChage;
         bool NumAllowed = 1;
         void add(char);
+        void add(double,int);
         sf::Text printData();
         sf::RectangleShape BoxScreen();
-        int Get_size();
         string GetData();
         void dataReset();
         void Calculate();
-};
+        void OrderClear();
+    };
 
 string Screen::GetData(){
     return dataStr;
+}
+
+void Screen::OrderClear(){
+    Order.clear();
+    Data.clear();
 }
 
 void Screen::Calculate(){
     if (Data.size() == 2){
         if (OpRn == '+'){
            Data[0] = Data[0]+Data[1];
-           Data.pop_back();
         }
-        dataStr = to_string(Data[0]);
         if (OpRn == '-'){
            Data[0] = Data[0]-Data[1];
-           Data.pop_back();
         }
-        dataStr = to_string(Data[0]);
         if (OpRn == 'x'){
            Data[0] = Data[0]*Data[1];
-           Data.pop_back();
         }
-        dataStr = to_string(Data[0]);
         if (OpRn == '/'){
            Data[0] = Data[0]/Data[1];
-           Data.pop_back();
         }
+        
         stringstream c;
         c << fixed << setprecision(2) << Data[0];
         dataStr = c.str();
+        indexMustChage = Order[1];
+        newData = Data[0];
+        newDataStr = c.str();
     }
 }
 
@@ -148,14 +157,15 @@ void Screen::dataReset(){
     dataStr = "";
 }
 
+void Screen::add(double inputNumber,int index){
+    Data.push_back(inputNumber);
+    dataStr += inputNumber;
+    Order.push_back(index);
+}
+
 void Screen::add(char inputNumber){
-    if (NumAllowed == 1){
-        Data.push_back((int)inputNumber-48);
-        dataStr += inputNumber;
-    }else{
-        OpRn = inputNumber;
-        dataStr += inputNumber;
-    }
+    OpRn = inputNumber;
+    dataStr += inputNumber;
 }
 
 
@@ -175,9 +185,6 @@ sf::RectangleShape Screen::BoxScreen(){
     return Box;
 }
 
-// int Screen::Get_size(){
-//     return dataStr.size();
-// }
 
 void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
 {
