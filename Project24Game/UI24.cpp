@@ -1,8 +1,11 @@
 #include "GameUi.h"
+#include "24GameAlgo.h"
 
 void GameSystem24();
 void ScoreBoard(const map<string, int>& data);
 void Menu();
+void Round(string,string);
+void pauseScreen();
 
 bool inGame24 = 0;
 sf::Texture texture("Images/Background.jpg");
@@ -17,7 +20,14 @@ enum GameState { // state of game to process more easily
     RANDOM_MODE,
     SCORE_BOARD
 };
+enum Game24subState {
+    NotInGame,
+    InRound24,
+    InPause,
+};
+
 GameState state = MENU;
+Game24subState gameOn = NotInGame; 
 
 int main()
 {    
@@ -35,7 +45,7 @@ int main()
         while (const std::optional event = window.pollEvent()){
             if (event->is<sf::Event::Closed>()) window.close();
             if (state == MENU){Menu();}
-            if (state == GAME24){GameSystem24();}
+            if (state == GAME24){usleep(80000);GameSystem24();}
             if (state == SCORE_BOARD){
                 map<string, int> data = {
                     {"MING", 100},
@@ -44,7 +54,7 @@ int main()
                     {"ARM", 25},
                     {"PUPP", 5}
                 };
-
+                usleep(80000);
                 ScoreBoard(data);
             }
         }
@@ -159,7 +169,19 @@ void Menu(){
 }
 
 void GameSystem24(){
-    string setNumber = "1236";
+    int type_games = 24;
+    createList(type_games);
+    string goal = to_string(type_games)+".00";
+    while (state == GAME24){ 
+        gameOn = InRound24; // for debug change to in InRound24
+        string setNumber = getfile(); // random
+        Round(setNumber,goal);
+        usleep(11000);
+        pauseScreen();
+    }
+}
+
+void Round(string setNumber,string goal){
     Screen Display;
     bool gateway[] = {0,0,0,0};
     bool hasDel = 0;
@@ -283,7 +305,7 @@ void GameSystem24(){
     sf::CircleShape Div = div.Circle_builtButton(); 
     sf::CircleShape Get_Back = GetBack.Circle_builtButton(); 
     sf::CircleShape dele = del.Circle_builtButton(); 
-    while (state == GAME24){
+    while (gameOn == InRound24){
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
         window.clear(); 
         window.draw(number_1);
@@ -316,10 +338,10 @@ void GameSystem24(){
         //
         window.draw(Div);
         window.draw(div.Circle_txtBox(Div.getPosition()));
-        
-        ////
         window.draw(Display.BoxScreen());
-            ///////////////// NumPad 
+        if (Display.GetData() == goal && gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1){
+            gameOn = InPause;
+        }
         if (Display.NumAllowed == 1)
         {
             if (number_1.getGlobalBounds().contains(mouse_pos)) 
@@ -403,39 +425,74 @@ void GameSystem24(){
                 }else{
                     Div.setFillColor(div.ColorBox);
                 }
+        }
+        if (dele.getGlobalBounds().contains(mouse_pos)){
+            dele.setFillColor(sf::Color(44,75,22));
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && hasDel == 0){
+                Display.dataReset();
+                for(int l = 0 ; l < 4; l++) gateway[l] = 0;
+                hasDel = 1;
+            }else{hasDel = 0;}
+        }else{
+            dele.setFillColor(number4.ColorBox); 
+        }
+        if (Get_Back.getGlobalBounds().contains(mouse_pos)) 
+        {
+            Get_Back.setFillColor(sf::Color(44,75,22)); 
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                window.clear();
+                state = MENU;
+                gameOn = NotInGame;
             }
-
-
-
-
-            ///////////////////
-
-            /////////////////// del - getback
-            if (dele.getGlobalBounds().contains(mouse_pos)){
-                dele.setFillColor(sf::Color(44,75,22));
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && hasDel == 0){
-                    Display.dataReset();
-                    for(int l = 0 ; l < 4; l++) gateway[l] = 0;
-                    hasDel = 1;
-                }else{hasDel = 0;}
-            }else{
-                dele.setFillColor(number4.ColorBox); 
-            }
-            if (Get_Back.getGlobalBounds().contains(mouse_pos)) 
-            {
-                Get_Back.setFillColor(sf::Color(44,75,22)); 
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                    window.clear();
-                    state = MENU;
-                        
-                }
-            }
+        }
             ////////////////////////////////////////////////
-            Display.Calculate();
-            window.draw(Display.printData());
-            window.display();
+        Display.Calculate();
+        window.draw(Display.printData());
+        window.display();
     }
 }
+
+
+void pauseScreen(){ // add steak // time // score
+    Pause TitlePause("PauseTime",100,windowSize_x/2,100);
+    Pause TimeShow("02.00",60,windowSize_x*2/10,WindowSize_y*4/10);
+    Pause StreakShow("Streak",60,windowSize_x*8/10,WindowSize_y*4/10);
+    Pause ScoreShow("Score",60,windowSize_x*5/10,WindowSize_y*6/10);
+    buttonBuild GoNext = buttonBuild{
+        .posBox_x = windowSize_x*5/10,
+        .posBox_y = WindowSize_y*8/10, // 2.5 when no float was assian as double type
+        .FontSize = 50,
+        .buttonSize_x = 225,
+        .buttonSize_y = 100,
+        .X = 0,
+        .Y = 0,
+        .name = "GoNext",
+        .ColorBox = sf::Color(0,51,102)
+    };
+    sf::RectangleShape buttonGo = GoNext.builtButton();
+    while (gameOn == InPause)
+    {
+        auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        window.clear();
+        window.draw(buttonGo);
+        window.draw(GoNext.txtBox(buttonGo.getGeometricCenter()));
+        window.draw(TitlePause.showText());
+        window.draw(TimeShow.showText());
+        window.draw(StreakShow.showText());
+        window.draw(ScoreShow.showText());
+        if (buttonGo.getGlobalBounds().contains(mouse_pos)){
+            buttonGo.setFillColor(sf::Color(0,75,22));
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                gameOn = InRound24;
+            }else{
+                buttonGo.setFillColor(GoNext.ColorBox);
+            }
+        }
+        window.display();
+    }
+    
+}
+
 
 void ScoreBoard(const map<string, int>& data){
     sprite_win.setPosition({0, 0});
