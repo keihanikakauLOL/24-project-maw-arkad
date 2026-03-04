@@ -100,6 +100,7 @@ public:
         int streak;
         int timeLeft;
     };
+    
     void streakTrack() {
         while (runaway){
             // Handle correct answer
@@ -225,21 +226,26 @@ private:
 public:
 
     void start() {
-        t1 = std::thread(&Game::timer, this);
-        t2 = std::thread(&Game::streakTrack, this);
-        t3 = std::thread(&Game::endGame, this);
+    if (t1.joinable() || t2.joinable() || t3.joinable()) return;
+    t1 = std::thread(&Game::timer, this);
+    t2 = std::thread(&Game::streakTrack, this);
+    t3 = std::thread(&Game::endGame, this);
     }
+
     void setPlayerName(std::string name) {
         playerName = name;
     }
+
     void updateQuestionTime(double timeTaken) {
         if (timeTaken > maxTimeThisLevel) {
             maxTimeThisLevel = timeTaken;
         }
     }
+
     User getUserData() const {
         return User(playerName, maxTimeThisLevel, scoremax.load(), streakmax.load());
     }
+
     GameState ChooseYourChoice() {
         paused = true;
         GameState state;
