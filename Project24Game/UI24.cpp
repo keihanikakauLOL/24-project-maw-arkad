@@ -540,7 +540,7 @@ void Round(string setNumberString,double goal){ // time
 void pauseScreen(){ // add steak  // score
     Pause TitlePause("PauseTime",100,windowSize_x/2,100);
     Pause StreakShow("Streak",60,windowSize_x*8/10,WindowSize_y*4/10);
-    Pause ScoreShow("Score",60,windowSize_x*5/10,WindowSize_y*6/10);
+    Pause ScoreShow("Score",60,windowSize_x*2/10,WindowSize_y*4/10);
     buttonBuild GoNext = buttonBuild{
         .posBox_x = windowSize_x*5/10,
         .posBox_y = WindowSize_y*8/10, // 2.5 when no float was assian as double type
@@ -557,6 +557,8 @@ void pauseScreen(){ // add steak  // score
     {
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
         window.clear();
+        ScoreStreak_inPause(window, 25 ,windowSize_x*2/10,WindowSize_y*5/10); // score => getTolScore()
+        ScoreStreak_inPause(window, 5  ,windowSize_x*8/10,WindowSize_y*5/10); // streak => getCurrentStreak()
         window.draw(buttonGo);
         window.draw(GoNext.txtBox(buttonGo.getGeometricCenter()));
         window.draw(TitlePause.showText());

@@ -411,3 +411,23 @@ public:
         frameTime = t;
     }
 };
+
+void ScoreStreak_inPause(sf::RenderWindow& window, int point, float posX, float posY){
+    sf::Text scoreText(font, to_string(point));
+    scoreText.setCharacterSize(24);
+    scoreText.setFillColor(sf::Color::White);
+    scoreText.setOutlineColor(sf::Color::Black);
+    scoreText.setOutlineThickness(2.f);
+
+    sf::CircleShape scoreCircle(50.f);
+    scoreCircle.setOrigin(scoreCircle.getGeometricCenter());
+    scoreCircle.setPosition({posX, posY});
+    scoreCircle.setFillColor(sf::Color(255,0,0));
+    window.draw(scoreCircle);
+
+    sf::FloatRect scoreBounds = scoreText.getLocalBounds();
+    scoreText.setOrigin({scoreBounds.position.x + scoreBounds.size.x / 2.f,scoreBounds.position.y + scoreBounds.size.y / 2.f});
+    scoreText.setPosition(scoreCircle.getPosition());
+    window.draw(scoreText);
+    
+}
