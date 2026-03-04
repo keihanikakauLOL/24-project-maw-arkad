@@ -101,6 +101,7 @@ public:
         int timeLeft;
     };
 
+    
 private:
     std::atomic<int> timeLeft{30};
     std::atomic<int> score{0};
