@@ -6,6 +6,7 @@ void GameSystem24();
 void ScoreBoard(const map<string, int>& data);
 void Menu();
 void Round(string,double);
+void GameRandom();
 void pauseScreen();
 // Game stat;
 bool inGame24 = 0;
@@ -23,7 +24,7 @@ enum GameState { // state of game to process more easily
 };
 enum Game24subState {
     NotInGame,
-    InRound24,
+    InRound,
     InPause,
 };
 
@@ -40,13 +41,15 @@ int main()
     sprite.setPosition({0, 0});
     sprite.setScale({800.f / texture.getSize().x, 800.f / texture.getSize().y});
     window.setFramerateLimit(144);
-    
+    createQuestions(); 
+    srand(time(0));
     while (window.isOpen())
     {
         while (const std::optional event = window.pollEvent()){
             if (event->is<sf::Event::Closed>()) window.close();
             if (state == MENU){Menu();}
             if (state == GAME24){usleep(80000);GameSystem24();}
+            if (state == RANDOM_MODE){usleep(80000);GameRandom();}
             if (state == SCORE_BOARD){
                 map<string, int> data = {
                     {"MING", 100},
@@ -151,6 +154,9 @@ void Menu(){
                 if(isOver_24){ // clicked happen on button_24 or not 
                     state = GAME24;
                 }
+                if(isOver_N){
+                    state = RANDOM_MODE;
+                }
                 if(isOver_Score){
                     state = SCORE_BOARD;
                 }
@@ -172,12 +178,29 @@ void Menu(){
 void GameSystem24(){
     int type_games = 24;
     double goal = (double)type_games;
+    newCreateList(type_games);
     while (state == GAME24){ 
-        gameOn = InRound24; // for debug change to in InRound24
-        string setNumber = "1194"; // random
+        gameOn = InRound; 
+        string setNumber = newGetfile(); // random
         // stat.start();
         Round(setNumber,goal);
-        // stat.pauseTimer(); // 1 1 9 4
+        // stat.pauseTimer(); // 1 1 9 4 //
+        usleep(11000);
+        pauseScreen();
+    }
+}
+
+void GameRandom(){
+    while (state == RANDOM_MODE){
+        int type_games = rand()%90+10;
+        double goal = (double)type_games;
+        cout << goal;
+        newCreateList(type_games); // 3 5 7 7 != 44 // 2 6 6 7 => 95
+        gameOn = InRound; 
+        string setNumber = newGetfile(); // random
+        // stat.start();
+        Round(setNumber,goal);
+        // stat.pauseTimer(); 
         usleep(11000);
         pauseScreen();
     }
@@ -185,7 +208,6 @@ void GameSystem24(){
 
 void Round(string setNumberString,double goal){ // time 
     double setNumber[4];
-    int gateAmount = 0;
     vector<string> setNumberStr;
     for (int i = 0 ;i < setNumberString.size(); i++){
         setNumberStr.push_back(to_string(setNumberString[i]-48));
@@ -314,7 +336,7 @@ void Round(string setNumberString,double goal){ // time
     sf::CircleShape Div = div.Circle_builtButton(); 
     sf::CircleShape Get_Back = GetBack.Circle_builtButton(); 
     sf::CircleShape dele = del.Circle_builtButton(); 
-    while (gameOn == InRound24){
+    while (gameOn == InRound){
         number1.name = setNumberStr[0];
         number2.name = setNumberStr[1];
         number3.name = setNumberStr[2];
@@ -356,9 +378,6 @@ void Round(string setNumberString,double goal){ // time
         window.draw(Div);
         window.draw(div.Circle_txtBox(Div.getPosition()));
         window.draw(Display.BoxScreen());
-        if ((setNumber[0] == goal || setNumber[1] == goal || setNumber[2] == goal || setNumber[3] == goal) && gateAmount == 3){
-            gameOn = InPause; // check part
-        }
         if (Display.NumAllowed == 1)
         {
             if (number_1.getGlobalBounds().contains(mouse_pos)) 
@@ -449,12 +468,12 @@ void Round(string setNumberString,double goal){ // time
                 Display.dataReset();
                 for(int l = 0 ; l < 4; l++) gateway[l] = 0;
                 setNumberStr.clear();
-                gateAmount = 0;
                 for (int i = 0 ;i < setNumberString.size(); i++){
                     setNumberStr.push_back(to_string(setNumberString[i]-48));
                     setNumber[i] = (double)setNumberString[i]-48;
-                    
-                }hasDel = 1;
+                }
+                hasDel = 1;
+                Display.AllClear();
             }else{hasDel = 0;}
         }else{
             dele.setFillColor(number4.ColorBox); 
@@ -471,9 +490,12 @@ void Round(string setNumberString,double goal){ // time
             }
         }
         Display.Calculate();
+        
         if (Display.Order.size() == 2)
         {
-            gateAmount++;
+            if (gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1 && Display.newData == goal){
+                gameOn = InPause; // check part
+            }
             setNumber[Display.indexMustChage] = Display.newData;
             setNumberStr[Display.indexMustChage] = Display.newDataStr;
             gateway[Display.indexMustChage] = 0;
@@ -485,6 +507,8 @@ void Round(string setNumberString,double goal){ // time
         window.display();
     }
 }
+
+// bug when num oper and clear
 
 
 void pauseScreen(){ // add steak  // score
@@ -516,7 +540,7 @@ void pauseScreen(){ // add steak  // score
             buttonGo.setFillColor(sf::Color(0,75,22));
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                 usleep(80000);
-                gameOn = InRound24;
+                gameOn = InRound;
             }else{
                 buttonGo.setFillColor(GoNext.ColorBox);
             }

@@ -112,8 +112,17 @@ class Screen{
         sf::RectangleShape BoxScreen();
         void dataReset();
         void Calculate();
+        void AllClear();
         void OrderClear();
     };
+
+void Screen::AllClear(){
+    Data.clear();
+    Order.clear();
+    newData = 0;
+    indexMustChage = 0;
+    NumAllowed = 1;
+}
 
 void Screen::OrderClear(){
     Order.clear();
