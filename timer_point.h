@@ -101,7 +101,7 @@ public:
         int timeLeft;
     };
     void streakTrack() {
-        for (int i = 0;i < 3;i++){
+        while (runaway){
             // Handle correct answer
             if (running && answeredCorrect) {
                 streak++;
