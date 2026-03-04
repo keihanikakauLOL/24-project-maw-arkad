@@ -101,8 +101,7 @@ public:
         int timeLeft;
     };
     void streakTrack() {
-        while (runaway) {
-            // Handle correct answer
+ 
             if (running && answeredCorrect) {
                 streak++;
                 if (streak >= streak_base) {
@@ -136,7 +135,7 @@ public:
             }
             
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
+        
     }
 
     
