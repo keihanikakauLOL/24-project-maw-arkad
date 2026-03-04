@@ -204,3 +204,7 @@ string newGetfile() {
     count++;
     return combination[shuff[count]];
 }
+
+void clearvector() {
+    shuff.clear();
+}
