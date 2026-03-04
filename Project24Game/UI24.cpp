@@ -10,9 +10,7 @@ void GameRandom();
 void pauseScreen();
 // Game stat;
 bool inGame24 = 0;
-sf::Texture texture("Images/Background.jpg");
 sf::Texture texture_win("Images/Winnig2.jpg");
-sf::Sprite sprite(texture);
 sf::Sprite sprite_win(texture_win);
 sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name' tit?
 
@@ -33,13 +31,6 @@ Game24subState gameOn = NotInGame;
 
 int main()
 {    
-    texture.setSmooth(true);
-    if (!texture.loadFromFile("Images/Background.jpg"))
-    {
-    return -1;
-    }
-    sprite.setPosition({0, 0});
-    sprite.setScale({800.f / texture.getSize().x, 800.f / texture.getSize().y});
     window.setFramerateLimit(144);
     createQuestions(); 
     srand(time(0));
@@ -162,7 +153,6 @@ void Menu(){
                 }
             } 
             // windown.draw is order by line to line upper = under
-            window.draw(sprite);
             window.draw(tilte.TitleName());
             window.draw(button_24);
             window.draw(button_N);
@@ -195,9 +185,10 @@ void GameRandom(){
         int type_games = rand()%90+10;
         double goal = (double)type_games;
         cout << goal;
-        newCreateList(type_games); // 3 5 7 7 != 44 // 2 6 6 7 => 95
+        clearvector();
+        newCreateList(type_games);
         gameOn = InRound; 
-        string setNumber = newGetfile(); // random
+        string setNumber = newGetfile(); 
         // stat.start();
         Round(setNumber,goal);
         // stat.pauseTimer(); 
@@ -312,11 +303,22 @@ void Round(string setNumberString,double goal){ // time
             .posBox_x = windowSize_x*90/100,
             .posBox_y = WindowSize_y*35/100, // 2.5 when no float was assian as double type
             .FontSize = 25,
+            .Radius = 30,
+            .PointinCircle = 100,
+            .X = 0,
+            .Y = 0,
+            .name = "Clear",
+            .ColorBox = sf::Color(255,20,52)
+        };   
+    Circle_buttonBuild ret = { // cic
+            .posBox_x = windowSize_x*90/100,
+            .posBox_y = WindowSize_y*45/100, // 2.5 when no float was assian as double type
+            .FontSize = 25,
             .Radius = 25,
             .PointinCircle = 100,
             .X = 0,
             .Y = 0,
-            .name = "BS",
+            .name = "Re",
             .ColorBox = sf::Color(255,20,52)
         };   
     Circle_buttonBuild GetBack = { // cic
@@ -336,6 +338,7 @@ void Round(string setNumberString,double goal){ // time
     sf::CircleShape Div = div.Circle_builtButton(); 
     sf::CircleShape Get_Back = GetBack.Circle_builtButton(); 
     sf::CircleShape dele = del.Circle_builtButton(); 
+    sf::CircleShape Ret = ret.Circle_builtButton(); 
     while (gameOn == InRound){
         number1.name = setNumberStr[0];
         number2.name = setNumberStr[1];
@@ -365,6 +368,9 @@ void Round(string setNumberString,double goal){ // time
         //
         window.draw(dele);
         window.draw(del.Circle_txtBox(dele.getPosition()));
+        //
+        window.draw(Ret);
+        window.draw(ret.Circle_txtBox(Ret.getPosition()));
         //
         window.draw(Plus);
         window.draw(plus.Circle_txtBox(Plus.getPosition()));
@@ -489,11 +495,28 @@ void Round(string setNumberString,double goal){ // time
                 
             }
         }
+        if (Ret.getGlobalBounds().contains(mouse_pos)) 
+        {
+            Ret.setFillColor(sf::Color(44,75,22)); 
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && Display.Order.size() > 0 && Display.NumAllowed == 0){
+                gateway[Display.Order.back()] = 0;
+                Display.Order.pop_back();
+                Display.DeleDataLast();
+                Display.NumAllowed = 1;
+            }
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && Display.Order.size() > 0 && Display.NumAllowed == 1){
+                Display.NumAllowed = 0;
+                usleep(80000);
+            }
+        }else{
+            Ret.setFillColor(ret.ColorBox);
+        }
         Display.Calculate();
         
         if (Display.Order.size() == 2)
         {
-            if (gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1 && Display.newData == goal){
+            if (gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1 && Display.newData-goal < 1e-9){ //tips
+
                 gameOn = InPause; // check part
             }
             setNumber[Display.indexMustChage] = Display.newData;

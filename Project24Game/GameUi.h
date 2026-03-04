@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include <string>
 #include <vector>
 #include <sstream>
@@ -111,6 +110,7 @@ class Screen{
         sf::Text printData();
         sf::RectangleShape BoxScreen();
         void dataReset();
+        void DeleDataLast();
         void Calculate();
         void AllClear();
         void OrderClear();
@@ -122,6 +122,10 @@ void Screen::AllClear(){
     newData = 0;
     indexMustChage = 0;
     NumAllowed = 1;
+}
+
+void Screen::DeleDataLast(){
+    Data.pop_back();
 }
 
 void Screen::OrderClear(){
