@@ -98,9 +98,7 @@ sf::Text Pause::showText(){
 }
 
 class Screen{
-   
     vector<double> Data;
-    string dataStr = "";
     char OpRn;
     public: 
         vector<int>Order;
@@ -112,15 +110,10 @@ class Screen{
         void add(double,int);
         sf::Text printData();
         sf::RectangleShape BoxScreen();
-        string GetData();
         void dataReset();
         void Calculate();
         void OrderClear();
     };
-
-string Screen::GetData(){
-    return dataStr;
-}
 
 void Screen::OrderClear(){
     Order.clear();
@@ -144,7 +137,6 @@ void Screen::Calculate(){
         
         stringstream c;
         c << fixed << setprecision(2) << Data[0];
-        dataStr = c.str();
         indexMustChage = Order[1];
         newData = Data[0];
         newDataStr = c.str();
@@ -154,23 +146,20 @@ void Screen::Calculate(){
 void Screen::dataReset(){
     Data.clear();
     NumAllowed = 1;
-    dataStr = "";
 }
 
 void Screen::add(double inputNumber,int index){
     Data.push_back(inputNumber);
-    dataStr += inputNumber;
     Order.push_back(index);
 }
 
 void Screen::add(char inputNumber){
     OpRn = inputNumber;
-    dataStr += inputNumber;
 }
 
 
 sf::Text Screen::printData(){
-    sf::Text Datas(font,dataStr,100);
+    sf::Text Datas(font,"getTimeREalTime",100);
     sf::FloatRect boundScreen = Datas.getLocalBounds();
     Datas.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
     Datas.setPosition({windowSize_x/2,150});

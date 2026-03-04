@@ -5,7 +5,7 @@
 void GameSystem24();
 void ScoreBoard(const map<string, int>& data);
 void Menu();
-void Round(string,string);
+void Round(string,double);
 void pauseScreen();
 // Game stat;
 bool inGame24 = 0;
@@ -171,8 +171,7 @@ void Menu(){
 
 void GameSystem24(){
     int type_games = 24;
-    string goal = to_string(type_games)+".00";
-    
+    double goal = (double)type_games;
     while (state == GAME24){ 
         gameOn = InRound24; // for debug change to in InRound24
         string setNumber = "1194"; // random
@@ -184,8 +183,9 @@ void GameSystem24(){
     }
 }
 
-void Round(string setNumberString,string goal){ // time 
+void Round(string setNumberString,double goal){ // time 
     double setNumber[4];
+    int gateAmount = 0;
     vector<string> setNumberStr;
     for (int i = 0 ;i < setNumberString.size(); i++){
         setNumberStr.push_back(to_string(setNumberString[i]-48));
@@ -319,6 +319,10 @@ void Round(string setNumberString,string goal){ // time
         number2.name = setNumberStr[1];
         number3.name = setNumberStr[2];
         number4.name = setNumberStr[3];
+        if (gateway[0] == 1){number_1.setFillColor(sf::Color::Blue);}
+        if (gateway[1] == 1){number_2.setFillColor(sf::Color::Blue);}
+        if (gateway[2] == 1){number_3.setFillColor(sf::Color::Blue);} // need to change to invisible// 
+        if (gateway[3] == 1){number_4.setFillColor(sf::Color::Blue);}
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
         window.clear(); 
         window.draw(number_1);
@@ -352,8 +356,8 @@ void Round(string setNumberString,string goal){ // time
         window.draw(Div);
         window.draw(div.Circle_txtBox(Div.getPosition()));
         window.draw(Display.BoxScreen());
-        if (Display.GetData() == goal && gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1){
-            gameOn = InPause;
+        if ((setNumber[0] == goal || setNumber[1] == goal || setNumber[2] == goal || setNumber[3] == goal) && gateAmount == 3){
+            gameOn = InPause; // check part
         }
         if (Display.NumAllowed == 1)
         {
@@ -377,7 +381,6 @@ void Round(string setNumberString,string goal){ // time
                     Display.NumAllowed = 0;
                 }
                 }else{
-                    if (gateway[1] == 1){number_1.setFillColor(sf::Color::Blue);}
                     number_2.setFillColor(number2.ColorBox);
                 }
                 if (number_3.getGlobalBounds().contains(mouse_pos)) 
@@ -389,7 +392,6 @@ void Round(string setNumberString,string goal){ // time
                         Display.NumAllowed = 0;
                     }
                 }else{
-                    if (gateway[2] == 1){number_1.setFillColor(sf::Color::Blue);}
                     number_3.setFillColor(number3.ColorBox); 
                 }
                 if (number_4.getGlobalBounds().contains(mouse_pos)){
@@ -400,7 +402,6 @@ void Round(string setNumberString,string goal){ // time
                         Display.NumAllowed = 0;
                     }
                 }else{
-                    if (gateway[3] == 1){number_1.setFillColor(sf::Color::Blue);}
                     number_4.setFillColor(number4.ColorBox); 
                 }
             }
@@ -447,7 +448,13 @@ void Round(string setNumberString,string goal){ // time
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && hasDel == 0){
                 Display.dataReset();
                 for(int l = 0 ; l < 4; l++) gateway[l] = 0;
-                hasDel = 1;
+                setNumberStr.clear();
+                gateAmount = 0;
+                for (int i = 0 ;i < setNumberString.size(); i++){
+                    setNumberStr.push_back(to_string(setNumberString[i]-48));
+                    setNumber[i] = (double)setNumberString[i]-48;
+                    
+                }hasDel = 1;
             }else{hasDel = 0;}
         }else{
             dele.setFillColor(number4.ColorBox); 
@@ -466,11 +473,11 @@ void Round(string setNumberString,string goal){ // time
         Display.Calculate();
         if (Display.Order.size() == 2)
         {
+            gateAmount++;
             setNumber[Display.indexMustChage] = Display.newData;
             setNumberStr[Display.indexMustChage] = Display.newDataStr;
             gateway[Display.indexMustChage] = 0;
             usleep(80000);
-            cout << Display.indexMustChage;
             Display.OrderClear();
             Display.NumAllowed = 1;
         }
@@ -508,6 +515,7 @@ void pauseScreen(){ // add steak  // score
         if (buttonGo.getGlobalBounds().contains(mouse_pos)){
             buttonGo.setFillColor(sf::Color(0,75,22));
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
+                usleep(80000);
                 gameOn = InRound24;
             }else{
                 buttonGo.setFillColor(GoNext.ColorBox);
