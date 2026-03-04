@@ -188,7 +188,7 @@ void newCreateList(int target = 24) {
             string temp = combination[i];
             arr[j] = (temp[j] - '0');
         }
-        if (check(arr, 4, target)) {
+        if (permutationforcheck(arr, target)) {
                 shuff.push_back(i);
             }
     }
