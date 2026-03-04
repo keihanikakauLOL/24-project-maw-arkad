@@ -36,6 +36,20 @@ void StreakTrack(bool ans){
         cout << "Total score: " << tolscore << endl;
     }
 }
+int getTolScore() {
+    static int tolscore = 0;  // Must match the static variable in StreakTrack
+    return tolscore;
+}
+
+int getMaxStreak() {
+    static int max_streak = 0;  // Must match the static variable in StreakTrack
+    return max_streak;
+}
+
+int getCurrentStreak() {
+    static int curstreak = 0;
+    return curstreak;
+}
 struct User{
     string name;
     double bestTime;        //เวลา มาก/น้อย สุดที่ Userใช้ภายใน 1 ด่าน ตอนนี้เป็นมากสุด ถ้าอยากแก้ก็แก้ได้
@@ -127,24 +141,16 @@ public:
 int main() {
 
 Scoreboard board;
-    board.addOrUpdatePlayer("Kyle", 45.5, 1200, 8);
-    board.addOrUpdatePlayer("Eric", 52.3, 980, 5);
-    board.addOrUpdatePlayer("Stan", 38.7, 1500, 12);
     
-    // Update Kyle with better score
-    board.addOrUpdatePlayer("Kyle", 50.0, 1800, 10);
+    // Play the game
+    StreakTrack(true);
+    StreakTrack(true);
+    StreakTrack(true);
+    StreakTrack(false);
     
-    // Display all players
+    // After game ends, save to scoreboard
+    board.addOrUpdatePlayer("Kyle", 45.5, getTolScore(), getMaxStreak());
+    
     board.displayAll();
-    
-    // Display top 3
-    board.displayScores(3);
-    
-    // Get specific player
-    User* player = board.getPlayer("Stan");
-    if (player) {
-        cout << "Stan's best time: " << player->bestTime << " seconds" << endl;
-    }
-
 }
 
