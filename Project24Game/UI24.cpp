@@ -13,6 +13,7 @@ bool inGame24 = 0;
 sf::Texture texture_win("Images/Winnig2.jpg");
 sf::Sprite sprite_win(texture_win);
 sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name' tit?
+Animation anim("BG", "Menu", "jpg", 25);
 
 enum GameState { // state of game to process more easily
     MENU,
@@ -115,6 +116,8 @@ void Menu(){
     while (state == MENU)
     {
         window.clear();
+        anim.update();
+        anim.draw(window);
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
             if (button_24.getGlobalBounds().contains(mouse_pos)) // check button is coline with mouse : augmentNeedtoCheck.getGlobalBound().contains(whatIscheckwith); >> getGlobalBound() = check coline
             {

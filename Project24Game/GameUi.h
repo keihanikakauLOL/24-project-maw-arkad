@@ -351,3 +351,63 @@ void drawBackArrow(sf::RenderWindow& window, sf::Vector2f position, float scale 
     window.draw(body);
     window.draw(head);
 }
+
+class Animation
+{
+private:
+    std::vector<sf::Texture> frames;
+    std::optional<sf::Sprite> sprite;
+    int currentFrame = 0;
+    float frameTime = 0.1f;
+    sf::Clock clock;
+
+public:
+    Animation() {}
+    Animation(const std::string& folder,
+              const std::string& baseName,
+              const std::string& extension,
+              int totalFrames)
+    {
+        load(folder, baseName, extension, totalFrames);
+    }
+
+    bool load(const std::string& folder,
+              const std::string& baseName,
+              const std::string& extension,
+              int totalFrames)
+    {
+        for (int i = 0; i < totalFrames; i++){
+            sf::Texture texture;
+            std::string path =
+                folder + "/" + baseName +
+                std::to_string(i) + "." + extension;
+            if (!texture.loadFromFile(path))
+                return false;
+            frames.push_back(texture);
+        }
+        if (!frames.empty())
+            sprite.emplace(frames[0]);  
+            sprite->setPosition({0, 0});
+            sprite->setScale({800.f / frames[0].getSize().x, 800.f / frames[0].getSize().y});
+        return true;
+    }
+    void update()
+    {
+        if (!sprite) return;
+        if (clock.getElapsedTime().asSeconds() > frameTime){
+            currentFrame++;
+            if (currentFrame >= frames.size())
+                currentFrame = 0;
+
+            sprite->setTexture(frames[currentFrame]);
+            clock.restart();
+        }
+    }
+    void draw(sf::RenderWindow& window){
+        if (sprite)
+            window.draw(*sprite);
+    }
+    void setFrameTime(float t){
+        frameTime = t;
+    }
+};
