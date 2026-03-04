@@ -10,7 +10,7 @@ void GameRandom();
 void pauseScreen();
 // Game stat;
 bool inGame24 = 0;
-sf::Texture texture_win("Images/Winnig2.jpg");
+sf::Texture texture_win("Images/Winnig.png");
 sf::Sprite sprite_win(texture_win);
 sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name' tit?
 Animation anim("BG", "Menu", "jpg", 25);
@@ -21,6 +21,7 @@ enum GameState { // state of game to process more easily
     RANDOM_MODE,
     SCORE_BOARD
 };
+
 enum Game24subState {
     NotInGame,
     InRound,
@@ -557,6 +558,7 @@ void pauseScreen(){ // add steak  // score
     {
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
         window.clear();
+        GradiantBackground_Pause(window);
         ScoreStreak_inPause(window, 25 ,windowSize_x*2/10,WindowSize_y*5/10); // score => getTolScore()
         ScoreStreak_inPause(window, 5  ,windowSize_x*8/10,WindowSize_y*5/10); // streak => getCurrentStreak()
         window.draw(buttonGo);
@@ -564,15 +566,18 @@ void pauseScreen(){ // add steak  // score
         window.draw(TitlePause.showText());
         window.draw(StreakShow.showText());
         window.draw(ScoreShow.showText());
+
         if (buttonGo.getGlobalBounds().contains(mouse_pos)){
             buttonGo.setFillColor(sf::Color(0,75,22));
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                 usleep(80000);
                 gameOn = InRound;
-            }else{
-                buttonGo.setFillColor(GoNext.ColorBox);
             }
         }
+            else{
+                buttonGo.setFillColor(GoNext.ColorBox);
+            }
+        
         window.display();
     }
     

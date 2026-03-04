@@ -201,7 +201,7 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
         float window_w = static_cast<float>(window.getSize().x);
         float window_h = static_cast<float>(window.getSize().y);
     //parameter
-        float baseY = 680.f;              // ยกฐานขึ้นจากขอบล่าง
+        float baseY = 750.f;              // ยกฐานขึ้นจากขอบล่าง
         float space = window_w / 3.f;     // แบ่ง 3 ช่อง
         float barWidth = 160.f;
         float scale = 320.f / data_max;   // scale พอดีจอ
@@ -257,14 +257,25 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
 
         sf::FloatRect nameBounds = nameText.getLocalBounds();
         nameText.setOrigin({nameBounds.position.x + nameBounds.size.x / 2.f,nameBounds.position.y + nameBounds.size.y / 2.f});
-        nameText.setPosition({posX, posY - 15.f});
+        nameText.setPosition({posX, posY - 50.f});
         window.draw(nameText);
 
-        
+        // STREAK 6️⃣7️⃣
+        sf::Text streakText(font, "streak :"); // รอใส่ getMaxStreak() 🤡🤡🤡🤡
+        streakText.setCharacterSize(26);
+        streakText.setFillColor(sf::Color::White);
+        streakText.setOutlineColor(sf::Color::Black);
+        streakText.setOutlineThickness(2.f);
+
+        sf::FloatRect streakBounds = streakText.getLocalBounds();
+        streakText.setOrigin({streakBounds.position.x + streakBounds.size.x / 2.f,streakBounds.position.y + streakBounds.size.y / 2.f});
+        streakText.setPosition({posX, posY - 20.f});
+        window.draw(streakText);
+
         // RANK CIRCLE
         sf::CircleShape circle(28.f);
         circle.setOrigin({28.f, 28.f});
-        circle.setPosition({posX, posY - 60.f});
+        circle.setPosition({posX, posY - 100.f});
         if (dataIndex == 0)
             circle.setFillColor(sf::Color(255,215,0));
         else if (dataIndex == 1)
@@ -430,4 +441,19 @@ void ScoreStreak_inPause(sf::RenderWindow& window, int point, float posX, float 
     scoreText.setPosition(scoreCircle.getPosition());
     window.draw(scoreText);
     
+}
+
+void GradiantBackground_Pause(sf::RenderWindow& window){
+    sf::VertexArray gradient(sf::PrimitiveType::TriangleStrip, 4);
+    gradient[0].position = {0.f, 0.f};
+    gradient[1].position = {800.f, 0.f};
+    gradient[2].position = {0.f, 800.f};
+    gradient[3].position = {800.f, 800.f};
+
+    // ไล่สี บน → ล่าง
+    gradient[0].color = sf::Color(80, 0, 150);
+    gradient[1].color = sf::Color(40, 0, 70);
+    gradient[2].color = sf::Color(10, 0, 20);
+    gradient[3].color = sf::Color(0, 0, 0);
+    window.draw(gradient);
 }
