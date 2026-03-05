@@ -182,14 +182,18 @@ void GameSystem24(){
     while (state == GAME24){ 
         gameOn = InRound; 
         string setNumber = newGetfile(); // random
+        stat.resumeTimer();
         Round(setNumber,goal);
         status = stat.ChooseYourChoice();
         // stat.pauseTimer(); // 1 1 9 4 //
+        stat.pauseTimer();
         usleep(11000);
         pauseScreen();
+        stat.resettimer();
     }
-    cout << status.score; //return score streak ; 
-    cout << Player_name;
+    // cout << status.score; //return score streak ; 
+    // cout << status.streak;
+    // cout << Player_name;
 }
 
 string EnterName(){
@@ -506,12 +510,12 @@ void Round(string setNumberString,double goal){ // time
             Get_Back.setFillColor(sf::Color(44,75,22)); 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
                 window.clear();
-                // stat.quit();
                 state = MENU;
                 gameOn = NotInGame;
                 
             }
         }
+        if (stat.getTimeLeft() == 0){state = MENU;gameOn = NotInGame;} // this if go to GG page
         if (Ret.getGlobalBounds().contains(mouse_pos)) 
         {
             Ret.setFillColor(sf::Color(44,75,22)); 
@@ -545,7 +549,7 @@ void Round(string setNumberString,double goal){ // time
             Display.OrderClear();
             Display.NumAllowed = 1;
         }
-        window.draw(Display.printData());
+        window.draw(Display.printData(stat.getTimeLeft()));
         window.display();
     }
 }

@@ -107,7 +107,7 @@ class Screen{
         bool NumAllowed = 1;
         void add(char);
         void add(double,int);
-        sf::Text printData();
+        sf::Text printData(int);
         sf::RectangleShape BoxScreen();
         void dataReset();
         void DeleDataLast();
@@ -171,8 +171,8 @@ void Screen::add(char inputNumber){
 }
 
 
-sf::Text Screen::printData(){
-    sf::Text Datas(font,"getTimeREalTime",100);
+sf::Text Screen::printData(int time){
+    sf::Text Datas(font,"Time: "+to_string(time),100);
     sf::FloatRect boundScreen = Datas.getLocalBounds();
     Datas.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
     Datas.setPosition({windowSize_x/2,150});
