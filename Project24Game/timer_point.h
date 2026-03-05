@@ -163,6 +163,7 @@ private:
 
                 if (timeLeft <= 0) {
                     timeLeft = 0;
+                    timerout();
                     timeout = true;
                 }
             }
@@ -280,6 +281,10 @@ public:
     
     void restart() {
         restartFlag = true;
+    }
+
+    bool timerout(){
+        return false;
     }
 
     void quit() {
