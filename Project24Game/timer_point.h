@@ -199,9 +199,9 @@ private:
 
 public:
     void start() {
-        if (t1.joinable() || t3.joinable()) return;
         t1 = std::thread(&Game::timer, this);
         t3 = std::thread(&Game::endGame, this);
+        paused = true;
     }
 
     void setPlayerName(std::string name) {
