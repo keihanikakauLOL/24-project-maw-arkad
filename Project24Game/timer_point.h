@@ -176,7 +176,6 @@ private:
             if (running && timeout) {
                 std::cout << "\n\n--- TIME'S UP! ---";
                 std::cout << "\nFinal Score: " << score << "\n";
-                running = false;
                 timeout = false;
                 streak = 0;
             }
