@@ -284,7 +284,7 @@ public:
     }
 
     bool timerout(){
-        return false;
+        return true;
     }
 
     void quit() {
