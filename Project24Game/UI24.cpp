@@ -33,6 +33,9 @@ enum Game24subState {
 GameState state = MENU;
 Game24subState gameOn = NotInGame; 
 Game::GameState status = stat.ChooseYourChoice();
+map<string, int> scoreData;
+string Player_Name;
+int Player_Score;
 
 int main()
 {    
@@ -48,15 +51,8 @@ int main()
             if (state == GAME24){usleep(80000);GameSystem24();}
             if (state == RANDOM_MODE){usleep(80000);GameRandom();}
             if (state == SCORE_BOARD){
-                map<string, int> data = {
-                    {"MING", 100},
-                    {"THIW", 20},
-                    {"SHO", 15},
-                    {"ARM", 25},
-                    {"PUPP", 5}
-                };
                 usleep(80000);
-                ScoreBoard(data);
+                ScoreBoard(scoreData);
             }
         }
     }
@@ -174,8 +170,11 @@ void Menu(){
 }
 
 void GameSystem24(){
+    status.score = 0;
+    status.streak = 0;
+    Player_Name = EnterName();// เปลี่ยนเป็น global
+    Player_Score = 0;
     gameOn = InEnterName;
-    string Player_name = EnterName();
     int type_games = 24;
     double goal = (double)type_games;
     newCreateList(type_games);
@@ -191,9 +190,10 @@ void GameSystem24(){
         pauseScreen();
         stat.resettimer();
     }
-    // cout << status.score; //return score streak ; 
+    // cout << status.score; //return score streak ;
+    Player_Score = status.score; 
     // cout << status.streak;
-    // cout << Player_name;
+    // cout << Player_Name;
 }
 
 string EnterName(){
@@ -515,7 +515,11 @@ void Round(string setNumberString,double goal){ // time
                 
             }
         }
-        if (stat.getTimeLeft() == 0){state = MENU;gameOn = NotInGame;} // this if go to GG page
+        if (stat.getTimeLeft() == 0){
+        scoreData[Player_Name] = max(scoreData[Player_Name], status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
+        state = MENU;
+        gameOn = NotInGame;
+        }       // this then GG สักอย่่างขอแก้กำ
         if (Ret.getGlobalBounds().contains(mouse_pos)) 
         {
             Ret.setFillColor(sf::Color(44,75,22)); 

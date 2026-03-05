@@ -178,6 +178,7 @@ private:
                 std::cout << "\nFinal Score: " << score << "\n";
                 timeout = false;
                 streak = 0;
+                score = 0; // thiw เพิ่มเอง score มันไม่รีเซ็ตตอนหมดเวลา
             }
 
             if (restartFlag) {

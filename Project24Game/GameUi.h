@@ -196,6 +196,8 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
          return a.second > b.second; // มากไปน้อย
      });
     int Top_THREE = min(3, (int)sortedData.size());
+    if (sortedData.empty())return;
+
     int data_max = sortedData[0].second;
     // size of window
         float window_w = static_cast<float>(window.getSize().x);
@@ -204,21 +206,28 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
         float baseY = 750.f;              // ยกฐานขึ้นจากขอบล่าง
         float space = window_w / 3.f;     // แบ่ง 3 ช่อง
         float barWidth = 160.f;
-        float scale = 320.f / data_max;   // scale พอดีจอ
+        float scale = (data_max > 0) ? 320.f / data_max : 1.f;   // scale พอดีจอ
         float No_1_barWidth = 200.f; // แท่งที่ 1 ใหญ่กว่า
 
 
     // podium
-    vector<int> podiumOrder = {1, 0, 2}; // (2,1,3)
+    vector<int> podiumOrder; // (2,1,3)
+    if (sortedData.size() == 1)
+        podiumOrder = {0};
+    else if (sortedData.size() == 2)
+        podiumOrder = {1,0};
+    else
+        podiumOrder = {1,0,2};
 
     for (int i = 0; i < Top_THREE; i++)
     {
         int dataIndex = podiumOrder[i];
+        if (dataIndex >= sortedData.size())continue;
         auto& [name, point] = sortedData[dataIndex];
         float barHeight = point * scale;
 
         // ทำ podium effect (แท่งกลางสูงกว่า)
-        if (i == 0) barHeight += 40.f;
+        if (dataIndex == 0) barHeight += 40.f;
         float width = (dataIndex == 0) ? No_1_barWidth : barWidth;
         float posX = (i + 0.5f) * space;
         float posY = baseY - barHeight;
