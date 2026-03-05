@@ -1,6 +1,6 @@
 #include "GameUi.h"
 #include "24GameAlgo.h"
-// #include "timer_point.h"
+#include "timer_point.h"
 
 void GameSystem24();
 void ScoreBoard(const map<string, int>& data);
@@ -8,7 +8,8 @@ void Menu();
 void Round(string,double);
 void GameRandom();
 void pauseScreen();
-// Game stat;
+string EnterName();
+Game stat;
 bool inGame24 = 0;
 sf::Texture texture_win("Images/Winnig.png");
 sf::Sprite sprite_win(texture_win);
@@ -24,15 +25,18 @@ enum GameState { // state of game to process more easily
 
 enum Game24subState {
     NotInGame,
+    InEnterName,
     InRound,
     InPause,
 };
 
 GameState state = MENU;
 Game24subState gameOn = NotInGame; 
+Game::GameState status = stat.ChooseYourChoice();
 
 int main()
 {    
+    stat.start();
     window.setFramerateLimit(144);
     createQuestions(); 
     srand(time(0));
@@ -170,18 +174,28 @@ void Menu(){
 }
 
 void GameSystem24(){
+    gameOn = InEnterName;
+    string Player_name = EnterName();
     int type_games = 24;
     double goal = (double)type_games;
     newCreateList(type_games);
     while (state == GAME24){ 
         gameOn = InRound; 
         string setNumber = newGetfile(); // random
-        // stat.start();
         Round(setNumber,goal);
+        status = stat.ChooseYourChoice();
         // stat.pauseTimer(); // 1 1 9 4 //
         usleep(11000);
         pauseScreen();
     }
+    cout << status.score; //return score streak ; 
+    cout << Player_name;
+}
+
+string EnterName(){
+    string nameUser;
+    cin >> nameUser;
+    return nameUser;
 }
 
 void GameRandom(){
@@ -193,9 +207,8 @@ void GameRandom(){
         newCreateList(type_games);
         gameOn = InRound; 
         string setNumber = newGetfile(); 
-        // stat.start();
         Round(setNumber,goal);
-        // stat.pauseTimer(); 
+        stat.pauseTimer(); 
         usleep(11000);
         pauseScreen();
     }
@@ -519,9 +532,11 @@ void Round(string setNumberString,double goal){ // time
         
         if (Display.Order.size() == 2)
         {
-            if (gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1 && Display.newData-goal < 1e-9){ //tips
-
-                gameOn = InPause; // check part
+            if (gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1){ //tips
+                if (true){ //abs(Display.newData-goal) < 1e-9 
+                    stat.updateStreakAndScore(true);
+                    gameOn = InPause; // check part
+                }else (stat.updateStreakAndScore(false));
             }
             setNumber[Display.indexMustChage] = Display.newData;
             setNumberStr[Display.indexMustChage] = Display.newDataStr;
@@ -535,7 +550,6 @@ void Round(string setNumberString,double goal){ // time
     }
 }
 
-// bug when num oper and clear
 
 
 void pauseScreen(){ // add steak  // score
@@ -559,8 +573,8 @@ void pauseScreen(){ // add steak  // score
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
         window.clear();
         GradiantBackground_Pause(window);
-        ScoreStreak_inPause(window, 25 ,windowSize_x*2/10,WindowSize_y*5/10); // score => getTolScore()
-        ScoreStreak_inPause(window, 5  ,windowSize_x*8/10,WindowSize_y*5/10); // streak => getCurrentStreak()
+        ScoreStreak_inPause(window, status.score ,windowSize_x*2/10,WindowSize_y*5/10); // score => getTolScore()
+        ScoreStreak_inPause(window, status.streak  ,windowSize_x*8/10,WindowSize_y*5/10); // streak => getCurrentStreak()
         window.draw(buttonGo);
         window.draw(GoNext.txtBox(buttonGo.getGeometricCenter()));
         window.draw(TitlePause.showText());

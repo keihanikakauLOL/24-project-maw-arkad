@@ -113,7 +113,7 @@ public:
                 if (streak > streakmax.load()) {
                     streakmax.store(streak.load());
                 }
-                received_score = base_score + (base_score * (streak / 10));
+                received_score = base_score + (base_score * (streak / 4));
                 std::cout << "\nCorrect! Streak: " << streak << std::endl;
                 std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
             } else {
@@ -123,10 +123,10 @@ public:
             }
             
             score += received_score;
-            
             if (score.load() > scoremax.load()) {
                 scoremax.store(score.load());
             }
+            //
         } else {
             streak = 0;
             std::cout << "\nWrong! Streak reset." << std::endl;
