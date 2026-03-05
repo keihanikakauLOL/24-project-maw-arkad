@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <vector>
 #include <algorithm>
+
 struct User {
     std::string name;
     double bestTime;
@@ -20,6 +21,7 @@ struct User {
     User(std::string n, double t, int score, int streak) 
         : name(n), bestTime(t), highestScore(score), highestStreak(streak) {}
 };
+
 class Scoreboard {
 private:
     std::map<std::string, User> players;
@@ -93,6 +95,7 @@ public:
         return players.find(name) != players.end();
     }
 };
+
 class Game {
 public:
     struct GameState {
@@ -101,46 +104,36 @@ public:
         int timeLeft;
     };
     
-    void streakTrack() {
-        while (runaway){
-            // Handle correct answer
-            if (running && answeredCorrect) {
-                streak++;
-                if (streak >= streak_base) {
-                    if (streak > streakmax.load()) {
-                        streakmax.store(streak.load());
-                    }
-                    received_score = base_score +(base_score * (streak/10));
-                    std::cout << "\nCorrect! Streak: " << streak << std::endl;
-                    std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
-                } else {
-                    received_score = base_score;
-                    std::cout << "\nCorrect!" << std::endl;
-                    std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
+    void updateStreakAndScore(bool isCorrect) {
+        if (!running) return;
+
+        if (isCorrect) {
+            streak++;
+            if (streak >= streak_base) {
+                if (streak > streakmax.load()) {
+                    streakmax.store(streak.load());
                 }
-                
-                score += received_score;
-                
-                if (score.load() > scoremax.load()) {
-                    scoremax.store(score.load());
-                }
-                
-                answeredCorrect = false;
+                received_score = base_score + (base_score * (streak / 10));
+                std::cout << "\nCorrect! Streak: " << streak << std::endl;
+                std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
+            } else {
+                received_score = base_score;
+                std::cout << "\nCorrect!" << std::endl;
+                std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
             }
             
-            // Handle wrong answer
-            if (running && answeredWrong) {
-                streak = 0;
-                std::cout << "\nWrong! Streak reset." << std::endl;
-                std::cout << "Total score: " << score << std::endl;
-                answeredWrong = false;
-            }
+            score += received_score;
             
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            if (score.load() > scoremax.load()) {
+                scoremax.store(score.load());
+            }
+        } else {
+            streak = 0;
+            std::cout << "\nWrong! Streak reset." << std::endl;
+            std::cout << "Total score: " << score << std::endl;
         }
     }
 
-    
 private:
     std::atomic<int> timeLeft{30};
     std::atomic<int> score{0};
@@ -150,8 +143,6 @@ private:
     std::atomic<bool> running{true};
     std::atomic<bool> runaway{true};
     std::atomic<bool> paused{false};
-    std::atomic<bool> answeredCorrect{false};
-    std::atomic<bool> answeredWrong{false};
     std::atomic<bool> timeout{false};
     std::atomic<bool> restartFlag{false};
 
@@ -161,8 +152,7 @@ private:
     const int streak_base = 3;
     std::string playerName;  
     double maxTimeThisLevel{0.0};  
-    std::thread t1, t2, t3;
-
+    std::thread t1, t3;
 
     void timer() {
         while (runaway) {
@@ -180,22 +170,6 @@ private:
         }
     }
 
-    //void pointSystem() {
-        //while (runaway) {
-            //if (running && answeredCorrect) {
-                //score += 10 * streak;
-                //streak++;
-                //answeredCorrect = false;
-                //if (score.load() > scoremax.load()) {
-                //    scoremax.store(score.load());
-                //}
-                //if (streak.load() > streakmax.load()) {
-                //    streakmax.store(streak.load());
-                //}
-            //}
-            //std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        //}
-    //}
     void endGame() {
         while (runaway) {
             if (running && timeout) {
@@ -217,19 +191,17 @@ private:
     void resetGame() {
         timeLeft = 30;
         score = 0;
-        streak = 1;
+        streak = 0;
         paused = false;
         running = true;
         std::cout << "\n--- Game Restarted! ---\n";
     }
 
 public:
-
     void start() {
-    if (t1.joinable() || t2.joinable() || t3.joinable()) return;
-    t1 = std::thread(&Game::timer, this);
-    t2 = std::thread(&Game::streakTrack, this);
-    t3 = std::thread(&Game::endGame, this);
+        if (t1.joinable() || t3.joinable()) return;
+        t1 = std::thread(&Game::timer, this);
+        t3 = std::thread(&Game::endGame, this);
     }
 
     void setPlayerName(std::string name) {
@@ -292,14 +264,16 @@ public:
 
     void addPoint() {
         if (running && !paused) {
-            answeredCorrect = true;
+            updateStreakAndScore(true);
         }
     }
+    
     void wrongAnswer() {
         if (running && !paused) {
-            answeredWrong = true;
+            updateStreakAndScore(false);
         }
     }
+    
     void restart() {
         restartFlag = true;
     }
@@ -311,7 +285,6 @@ public:
 
     void wait() {
         if (t1.joinable()) t1.join();
-        if (t2.joinable()) t2.join();
         if (t3.joinable()) t3.join();
     }
     
