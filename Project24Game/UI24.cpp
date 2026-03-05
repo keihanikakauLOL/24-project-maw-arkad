@@ -15,6 +15,7 @@ sf::Texture texture_win("Images/Winnig.png");
 sf::Sprite sprite_win(texture_win);
 sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name' tit?
 Animation anim("BG", "Menu", "jpg", 25);
+sf::Clock gameClock;
 
 enum GameState { // state of game to process more easily
     MENU,
@@ -370,7 +371,8 @@ void Round(string setNumberString,double goal){ // time
         if (gateway[2] == 1){number_3.setFillColor(sf::Color::Blue);} // need to change to invisible// 
         if (gateway[3] == 1){number_4.setFillColor(sf::Color::Blue);}
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));// "close requested" event: we close the window 
-        window.clear(); 
+        window.clear();
+        GradiantBackground_Game24(window);// เพ่มพื้นหลังแบบไล่สี 
         window.draw(number_1);
         window.draw(number1.txtBox(number_1.getPosition()));
         //
@@ -554,6 +556,7 @@ void Round(string setNumberString,double goal){ // time
             Display.NumAllowed = 1;
         }
         window.draw(Display.printData(stat.getTimeLeft()));
+        DrawKumWa_Time(window);
         window.display();
     }
 }
@@ -581,6 +584,8 @@ void pauseScreen(){ // add steak  // score
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
         window.clear();
         GradiantBackground_Pause(window);
+        float offset = fmod(gameClock.getElapsedTime().asSeconds()*60.f, 40.f);
+        DrawTronGrid(window, offset);
         ScoreStreak_inPause(window, status.score ,windowSize_x*2/10,WindowSize_y*5/10); // score => getTolScore()
         ScoreStreak_inPause(window, status.streak  ,windowSize_x*8/10,WindowSize_y*5/10); // streak => getCurrentStreak()
         window.draw(buttonGo);

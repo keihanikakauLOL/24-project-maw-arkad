@@ -172,10 +172,21 @@ void Screen::add(char inputNumber){
 
 
 sf::Text Screen::printData(int time){
-    sf::Text Datas(font,"Time: "+to_string(time),100);
+    sf::Text Datas(font, to_string(time),100);
     sf::FloatRect boundScreen = Datas.getLocalBounds();
     Datas.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
-    Datas.setPosition({windowSize_x/2,150});
+    Datas.setPosition({windowSize_x - 300.f,150});
+    Datas.setOutlineColor(sf::Color::Black);
+    Datas.setOutlineThickness(2.f);
+    if(time <= 5){
+        Datas.setFillColor(sf::Color(255,0,0));
+    }
+    else if (time <= 10){
+        Datas.setFillColor(sf::Color(255,153,51));
+    }
+    else{
+        Datas.setFillColor(sf::Color(255,255,153));
+    }
     return Datas;
 }
 
@@ -465,4 +476,49 @@ void GradiantBackground_Pause(sf::RenderWindow& window){
     gradient[2].color = sf::Color(10, 0, 20);
     gradient[3].color = sf::Color(0, 0, 0);
     window.draw(gradient);
+}
+
+void GradiantBackground_Game24(sf::RenderWindow& window){
+    sf::VertexArray gradient24(sf::PrimitiveType::TriangleStrip, 4);
+    gradient24[0].position = {0.f, 0.f};
+    gradient24[1].position = {800.f, 0.f};
+    gradient24[2].position = {0.f, 800.f};
+    gradient24[3].position = {800.f, 800.f};
+
+    // ไล่สี บน → ล่าง
+    gradient24[0].color = sf::Color(10,10,30);
+    gradient24[1].color = sf::Color(10,10,30);
+    gradient24[2].color = sf::Color(40,0,80);
+    gradient24[3].color = sf::Color(40,0,80);
+    window.draw(gradient24);
+}
+
+void DrawKumWa_Time(sf::RenderWindow& window){ // คำว่า Time: เฉยๆ แยกออกจากกัน กูอยากเปลี่ยนสีเฉพาะตัวเลข
+    sf::Text TimeText(font,"Time :",100);
+    sf::FloatRect boundScreen = TimeText.getLocalBounds();
+    TimeText.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
+    TimeText.setPosition({windowSize_x/3,150});
+    TimeText.setOutlineColor(sf::Color::Black);
+    TimeText.setOutlineThickness(2.f);
+    window.draw(TimeText);
+}
+
+void DrawTronGrid(sf::RenderWindow& window, float offset)
+{
+    int spacing = 40;
+    // เส้นแนวนอน 
+    for(int y = -800; y < 800; y += spacing)
+    {
+        float pos = y + offset;
+
+        sf::Vertex line[2];
+
+        line[0].position = sf::Vector2f(0.f, pos);
+        line[0].color = sf::Color(0,255,255,30);
+
+        line[1].position = sf::Vector2f(800.f, pos);
+        line[1].color = sf::Color(0,255,255,30);
+
+        window.draw(line, 2, sf::PrimitiveType::Lines);
+    }
 }
