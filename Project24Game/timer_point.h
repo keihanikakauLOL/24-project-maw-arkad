@@ -273,6 +273,10 @@ public:
             updateStreakAndScore(false);
         }
     }
+
+    void resettimer(){
+        timeLeft = 30;
+    }
     
     void restart() {
         restartFlag = true;
