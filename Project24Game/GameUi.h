@@ -550,3 +550,29 @@ void DrawTronGrid(sf::RenderWindow& window, float offset)
         window.draw(line, 2, sf::PrimitiveType::Lines);
     }
 }
+
+void GameOver_Text(sf::RenderWindow& window){
+    sf::Text gameOverText(font, "GAME OVER!!");
+    gameOverText.setCharacterSize(100);
+    gameOverText.setFillColor(sf::Color::White);
+    gameOverText.setOutlineColor(sf::Color::Black);
+    gameOverText.setOutlineThickness(2.f);
+
+    sf::FloatRect gameOverBounds = gameOverText.getLocalBounds();
+    gameOverText.setOrigin({gameOverBounds.position.x + gameOverBounds.size.x / 2.f,gameOverBounds.position.y + gameOverBounds.size.y / 2.f});
+    gameOverText.setPosition({windowSize_x/2, 300});
+    window.draw(gameOverText);
+}
+
+void EnterName_Text(sf::RenderWindow& window){
+    sf::Text EnterName(font, "- - ENTER YOUR NAME - -");
+    EnterName.setCharacterSize(50);
+    EnterName.setFillColor(sf::Color::White);
+    EnterName.setOutlineColor(sf::Color::Black);
+    EnterName.setOutlineThickness(2.f);
+
+    sf::FloatRect EnterNameBounds = EnterName.getLocalBounds();
+    EnterName.setOrigin({EnterNameBounds.position.x + EnterNameBounds.size.x / 2.f,EnterNameBounds.position.y + EnterNameBounds.size.y / 2.f});
+    EnterName.setPosition({windowSize_x/2, 200});
+    window.draw(EnterName);
+}

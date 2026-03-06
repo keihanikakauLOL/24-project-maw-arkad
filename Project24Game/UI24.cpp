@@ -16,6 +16,7 @@ sf::Texture texture_win("Images/Winnig.png");
 sf::Sprite sprite_win(texture_win);
 sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window variable with size and tittle name' tit?
 Animation anim("BG", "Menu", "jpg", 25);
+Animation anim_OverBG("GameOverBG", "gameOver ", "png", 26);
 sf::Clock gameClock;
 
 enum GameState { // state of game to process more easily
@@ -51,6 +52,11 @@ int main()
         if (state == GAME24){usleep(80000);GameSystem24();}
         if (state == RANDOM_MODE){usleep(80000);GameRandom();}
         if (state == SCORE_BOARD){
+            map<string, int> scoreData = {
+                {"ARM",55},
+                {"MING",60},
+                {"THIW",35}
+            };
             usleep(80000);
             ScoreBoard(scoreData);
         }
@@ -105,58 +111,47 @@ void Menu(){
     sf:: RectangleShape button_24 = button24.builtButton();
     sf:: RectangleShape button_N = buttonN.builtButton();
     sf:: RectangleShape button_Score = buttonScore.builtButton();
-
-
-    // for check mouse is over button or not and click button or not so we process more easily
-    bool isOver_24 = false;
-    bool isOver_N = false;
-    bool isOver_Score = false;
     
     
     // GameOn
     while (state == MENU)
     {
-        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) {stat.quit();window.close();return;}}
         window.clear();
         anim.update();
         anim.draw(window);
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        if(auto event = window.pollEvent()){
+            if (event->is<sf::Event::Closed>()) {stat.quit();window.close();return;}
+        
             if (button_24.getGlobalBounds().contains(mouse_pos)) // check button is coline with mouse : augmentNeedtoCheck.getGlobalBound().contains(whatIscheckwith); >> getGlobalBound() = check coline
             {
                 button_24.setFillColor(sf::Color(0,75,22)); // we can create animated or click to process
-                isOver_24 = true;
+                if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){state = GAME24;}
+                }
             }else{
                 button_24.setFillColor(button24.ColorBox); // reset went not set
-                isOver_24 = false;
             }
             if (button_N.getGlobalBounds().contains(mouse_pos)) // check button is coline with mouse : augmentNeedtoCheck.getGlobalBound().contains(whatIscheckwith); >> getGlobalBound() = check coline
             {
                 button_N.setFillColor(sf::Color(0,75,22)); // we can create animated or click to process
-                isOver_N = true;
+                if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){state = RANDOM_MODE;}
+                }
             }else{
                 button_N.setFillColor(buttonN.ColorBox); // reset went not set
-                isOver_N = false;
             }
             if (button_Score.getGlobalBounds().contains(mouse_pos)) // check button is coline with mouse : augmentNeedtoCheck.getGlobalBound().contains(whatIscheckwith); >> getGlobalBound() = check coline
             {
                 button_Score.setFillColor(sf::Color(0,75,22)); // we can create animated or click to process
-                isOver_Score = true;
+                if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){state = SCORE_BOARD;}
+                }
+                
             }else{
                 button_Score.setFillColor(buttonScore.ColorBox); // reset went not set
-                isOver_Score = false;
             }
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) // clicked 
-            {   
-                if(isOver_24){ // clicked happen on button_24 or not 
-                    state = GAME24;
-                }
-                if(isOver_N){
-                    state = RANDOM_MODE;
-                }
-                if(isOver_Score){
-                    state = SCORE_BOARD;
-                }
-            } 
+        }
             // windown.draw is order by line to line upper = under
             window.draw(tilte.TitleName());
             window.draw(button_24);
@@ -230,6 +225,8 @@ string EnterName(){
                 Player.name += Alpahbet;
             }
         }
+        GradiantBackground_Game24(window);
+        EnterName_Text(window);
         window.draw(EnterNameButton);
         window.draw(EnterName.txtBox(EnterNameButton.getGeometricCenter()));
         window.draw(Player.NameShow());
@@ -254,6 +251,8 @@ void GameOver(){
     sf::RectangleShape ReturnMenuButton = ReturnMenu.builtButton();
     while (gameOn == InGameOver){
         window.clear();
+        anim_OverBG.update();
+        anim_OverBG.draw(window);
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
         if(auto event = window.pollEvent()){
             if (event->is<sf::Event::Closed>()) window.close();
@@ -269,6 +268,7 @@ void GameOver(){
         }
         window.draw(ReturnMenuButton);
         window.draw(ReturnMenu.txtBox(ReturnMenuButton.getGeometricCenter()));
+        GameOver_Text(window);
         window.draw(Player.NameShow());
         window.display();
     }
@@ -437,7 +437,7 @@ void Round(string setNumberString,double goal){ // time
     sf::CircleShape dele = del.Circle_builtButton(); 
     sf::CircleShape Ret = ret.Circle_builtButton(); 
     while (gameOn == InRound){
-        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()){stat.quit();window.close();}}
+        
         number1.name = setNumberStr[0];
         number2.name = setNumberStr[1];
         number3.name = setNumberStr[2];
@@ -485,141 +485,167 @@ void Round(string setNumberString,double goal){ // time
         //
         window.draw(Display.ShowGoal(goal));
         window.draw(Display.BoxScreen());
-        if (Display.NumAllowed == 1)
-        {
-            if (number_1.getGlobalBounds().contains(mouse_pos)) 
+        if(auto event = window.pollEvent()){
+            if (event->is<sf::Event::Closed>()){stat.quit();window.close();}
+
+            if (Display.NumAllowed == 1)
             {
-                number_1.setFillColor(sf::Color(44,75,22)); 
-                if (gateway[0] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                    gateway[0] = 1;
-                    Display.add(setNumber[0],0);
-                    Display.NumAllowed = 0;
-                }
-            }else{
-                number_1.setFillColor(number1.ColorBox);
-            }
-            if (number_2.getGlobalBounds().contains(mouse_pos))
-            {
-                number_2.setFillColor(sf::Color(44,75,22)); 
-                if (gateway[1] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                    gateway[1] = 1;
-                    Display.add(setNumber[1],1); 
-                    Display.NumAllowed = 0;
-                }
-                }else{
-                    number_2.setFillColor(number2.ColorBox);
-                }
-                if (number_3.getGlobalBounds().contains(mouse_pos)) 
+                if (number_1.getGlobalBounds().contains(mouse_pos)) 
                 {
-                    number_3.setFillColor(sf::Color(44,75,22)); 
-                    if (gateway[2] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                        gateway[2] = 1;
-                        Display.add(setNumber[2],2);
-                        Display.NumAllowed = 0;
+                    number_1.setFillColor(sf::Color(44,75,22));
+                    if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                        if (gateway[0] == 0 && mouseButtonPressed->button == sf::Mouse::Button::Left){
+                            gateway[0] = 1;
+                            Display.add(setNumber[0],0);
+                            Display.NumAllowed = 0;
+                        }
                     }
                 }else{
-                    number_3.setFillColor(number3.ColorBox); 
+                    number_1.setFillColor(number1.ColorBox);
                 }
-                if (number_4.getGlobalBounds().contains(mouse_pos)){
-                    number_4.setFillColor(sf::Color(44,75,22));
-                    if (gateway[3] == 0 && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                        gateway[3] = 1;
-                        Display.add(setNumber[3],3);
-                        Display.NumAllowed = 0;
+                if (number_2.getGlobalBounds().contains(mouse_pos))
+                {
+                    number_2.setFillColor(sf::Color(44,75,22));
+                    if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                        if (gateway[1] == 0 && mouseButtonPressed->button == sf::Mouse::Button::Left){
+                            gateway[1] = 1;
+                            Display.add(setNumber[1],1); 
+                            Display.NumAllowed = 0;
+                        }
                     }
                 }else{
-                    number_4.setFillColor(number4.ColorBox); 
-                }
-            }
-            else{
-                if (Plus.getGlobalBounds().contains(mouse_pos)){
-                    Plus.setFillColor(sf::Color(44,75,22));
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                        Display.add('+');
-                        Display.NumAllowed = 1;
+                        number_2.setFillColor(number2.ColorBox);
+                    }
+                    if (number_3.getGlobalBounds().contains(mouse_pos)) 
+                    {
+                        number_3.setFillColor(sf::Color(44,75,22)); 
+                        if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                        if (gateway[2] == 0 && mouseButtonPressed->button == sf::Mouse::Button::Left){
+                            gateway[2] = 1;
+                            Display.add(setNumber[2],2);
+                            Display.NumAllowed = 0;
+                        }
                     }
                 }else{
-                    Plus.setFillColor(plus.ColorBox);
-                }
-                if (Minu.getGlobalBounds().contains(mouse_pos)){
-                    Minu.setFillColor(sf::Color(44,75,22));
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                        Display.add('-');
-                        Display.NumAllowed = 1;
+                        number_3.setFillColor(number3.ColorBox); 
                     }
-                }else{
-                    Minu.setFillColor(minu.ColorBox);
-                }
-                if (Mul.getGlobalBounds().contains(mouse_pos)){
-                    Mul.setFillColor(sf::Color(44,75,22));
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                        Display.add('x');
-                        Display.NumAllowed = 1;
+                    if (number_4.getGlobalBounds().contains(mouse_pos)){
+                        number_4.setFillColor(sf::Color(44,75,22));
+                        if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                            if (gateway[3] == 0 && mouseButtonPressed->button == sf::Mouse::Button::Left){
+                                gateway[3] = 1;
+                                Display.add(setNumber[3],3);
+                                Display.NumAllowed = 0;
+                            }
+                        }
+                    }else{
+                        number_4.setFillColor(number4.ColorBox); 
                     }
-                }else{
-                    Mul.setFillColor(mul.ColorBox);
                 }
-                if (Div.getGlobalBounds().contains(mouse_pos)){
-                    Div.setFillColor(sf::Color(44,75,22));
-                    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                        Display.add('/');
-                        Display.NumAllowed = 1;
+                else{
+                    if (Plus.getGlobalBounds().contains(mouse_pos)){
+                        Plus.setFillColor(sf::Color(44,75,22));
+                        if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                            if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                                Display.add('+');
+                                Display.NumAllowed = 1;
+                            }
+                        }
+                    }else{
+                        Plus.setFillColor(plus.ColorBox);
                     }
-                }else{
-                    Div.setFillColor(div.ColorBox);
+                    if (Minu.getGlobalBounds().contains(mouse_pos)){
+                        Minu.setFillColor(sf::Color(44,75,22));
+                        if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                            if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                                Display.add('-');
+                                Display.NumAllowed = 1;
+                            }
+                        }
+                    }else{
+                        Minu.setFillColor(minu.ColorBox);
+                    }
+                    if (Mul.getGlobalBounds().contains(mouse_pos)){
+                        Mul.setFillColor(sf::Color(44,75,22));
+                        if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                            if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                                Display.add('x');
+                                Display.NumAllowed = 1;
+                            }
+                        }
+                    }else{
+                        Mul.setFillColor(mul.ColorBox);
+                    }
+                    if (Div.getGlobalBounds().contains(mouse_pos)){
+                        Div.setFillColor(sf::Color(44,75,22));
+                        if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                            if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                                Display.add('/');
+                                Display.NumAllowed = 1;
+                            }
+                        }
+                    }else{
+                        Div.setFillColor(div.ColorBox);
+                    }
                 }
-        }
         if (dele.getGlobalBounds().contains(mouse_pos)){
             dele.setFillColor(sf::Color(44,75,22));
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && hasDel == 0){
-                Display.dataReset();
-                for(int l = 0 ; l < 4; l++) gateway[l] = 0;
-                setNumberStr.clear();
-                for (int i = 0 ;i < setNumberString.size(); i++){
-                    setNumberStr.push_back(to_string(setNumberString[i]-48));
-                    setNumber[i] = (double)setNumberString[i]-48;
+            if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                if (mouseButtonPressed->button == sf::Mouse::Button::Left && hasDel == 0){
+                    Display.dataReset();
+                    for(int l = 0 ; l < 4; l++) gateway[l] = 0;
+                    setNumberStr.clear();
+                    for (int i = 0 ;i < setNumberString.size(); i++){
+                        setNumberStr.push_back(to_string(setNumberString[i]-48));
+                        setNumber[i] = (double)setNumberString[i]-48;
+                    }
+                    Plus.setFillColor(plus.ColorBox);
+                    Mul.setFillColor(mul.ColorBox);
+                    Div.setFillColor(div.ColorBox);
+                    Minu.setFillColor(minu.ColorBox);
+                    hasDel = 1;
+                    Display.AllClear();
                 }
-                Plus.setFillColor(plus.ColorBox);
-                Mul.setFillColor(mul.ColorBox);
-                Div.setFillColor(div.ColorBox);
-                Minu.setFillColor(minu.ColorBox);
-                hasDel = 1;
-                Display.AllClear();
             }else{hasDel = 0;}
         }else{
             dele.setFillColor(number4.ColorBox); 
         }
         if (Get_Back.getGlobalBounds().contains(mouse_pos)) 
         {
-            Get_Back.setFillColor(sf::Color(44,75,22)); 
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                window.clear();
-                state = MENU;
-                gameOn = NotInGame;
-                
+            Get_Back.setFillColor(sf::Color(44,75,22));
+            if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                    window.clear();
+                    state = MENU;
+                    gameOn = NotInGame;
+                }
             }
         }
-        if (stat.getTimeLeft() == 0){
-            scoreData[Player_Name] = max(scoreData[Player_Name], status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
-            gameOn = InGameOver;
-            GameOver();
-        }       // this then GG สักอย่่างขอแก้กำ
         if (Ret.getGlobalBounds().contains(mouse_pos)) 
         {
-            Ret.setFillColor(sf::Color(44,75,22)); 
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && Display.Order.size() > 0 && Display.NumAllowed == 0){
-                gateway[Display.Order.back()] = 0;
-                Display.Order.pop_back();
-                Display.DeleDataLast();
-                Display.NumAllowed = 1;
+            Ret.setFillColor(sf::Color(44,75,22));
+            if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                if (mouseButtonPressed->button == sf::Mouse::Button::Left && Display.Order.size() > 0 && Display.NumAllowed == 0){
+                    gateway[Display.Order.back()] = 0;
+                    Display.Order.pop_back();
+                    Display.DeleDataLast();
+                    Display.NumAllowed = 1;
+                }
             }
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && Display.Order.size() > 0 && Display.NumAllowed == 1){
-                Display.NumAllowed = 0;
-                usleep(80000);
+            if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                if (mouseButtonPressed->button == sf::Mouse::Button::Left && Display.Order.size() > 0 && Display.NumAllowed == 1){
+                    Display.NumAllowed = 0;
+                    usleep(80000);
+                }
             }
         }else{
             Ret.setFillColor(ret.ColorBox);
         }
+    }   if (stat.getTimeLeft() == 0){
+            scoreData[Player_Name] = max(scoreData[Player_Name], status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
+            gameOn = InGameOver;
+            GameOver();
+        } 
         Display.Calculate();
         
         if (Display.Order.size() == 2)
@@ -663,8 +689,7 @@ void pauseScreen(){ // add steak  // score
     sf::RectangleShape buttonGo = GoNext.builtButton();
     while (gameOn == InPause)
     {
-        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) window.close();}
-        auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        
         window.clear();
         GradiantBackground_Pause(window);
         float offset = fmod(gameClock.getElapsedTime().asSeconds()*60.f, 40.f);
@@ -676,17 +701,22 @@ void pauseScreen(){ // add steak  // score
         window.draw(TitlePause.showText());
         window.draw(StreakShow.showText());
         window.draw(ScoreShow.showText());
-
-        if (buttonGo.getGlobalBounds().contains(mouse_pos)){
-            buttonGo.setFillColor(sf::Color(0,75,22));
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                usleep(80000);
-                gameOn = InRound;
+        auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        if(auto event = window.pollEvent()){
+            if (event->is<sf::Event::Closed>()) window.close();
+            if (buttonGo.getGlobalBounds().contains(mouse_pos)){
+                buttonGo.setFillColor(sf::Color(0,75,22));
+                if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                        usleep(80000);
+                        gameOn = InRound;
+                    }
+                }
             }
-        }
             else{
                 buttonGo.setFillColor(GoNext.ColorBox);
             }
+        }
         
         window.display();
     }
@@ -711,25 +741,29 @@ void ScoreBoard(const map<string, int>& data){
         };
     sf::CircleShape Back_Button_Rect = GetBack.Circle_builtButton();
         while (state == SCORE_BOARD){
-            auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
             window.clear();
             window.draw(sprite_win);
             Bar_Chart(window, data);
             window.draw(Back_Button_Rect);
             drawBackArrow(window, {25, 25}, 1.f, sf::Color::White); // draw back icon
             
-            if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) window.close();}
-            if (Back_Button_Rect.getGlobalBounds().contains(mouse_pos)) 
-            {
-                Back_Button_Rect.setFillColor(sf::Color(44,75,22)); 
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-                    window.clear();
-                    state = MENU;
+            auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+            if(auto event = window.pollEvent()){
+                if (event->is<sf::Event::Closed>()) window.close();
+                if (Back_Button_Rect.getGlobalBounds().contains(mouse_pos)) 
+                {
+                    Back_Button_Rect.setFillColor(sf::Color(44,75,22));
+                    if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                        if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                            window.clear();
+                            state = MENU;
+                        }
+                    }
+                }else{
+                    Back_Button_Rect.setFillColor(GetBack.ColorBox); 
                 }
-            }else{
-                Back_Button_Rect.setFillColor(GetBack.ColorBox); 
             }
             window.display();
-            }
+        }
              
 }
