@@ -95,6 +95,21 @@ sf::Text Pause::showText(){
     TextPause.setOutlineThickness(2.f);
     return TextPause;
 }
+class BoxName{
+    public:
+        string name = "";
+        sf::Text NameShow();
+};
+
+sf::Text BoxName::NameShow(){
+    sf::Text Text(font,name,60); 
+    sf::FloatRect bounds = Text.getLocalBounds();
+    Text.setOrigin({bounds.position.x+bounds.size.x/2,60-bounds.position.y});
+    Text.setPosition({windowSize_x/2,WindowSize_y/2});
+    Text.setOutlineColor(sf::Color::Black);
+    Text.setOutlineThickness(2.f);
+    return Text;
+}
 
 class Screen{
     vector<double> Data;
@@ -114,6 +129,7 @@ class Screen{
         void Calculate();
         void AllClear();
         void OrderClear();
+        sf::Text ShowGoal(double);
     };
 
 void Screen::AllClear(){
@@ -122,6 +138,18 @@ void Screen::AllClear(){
     newData = 0;
     indexMustChage = 0;
     NumAllowed = 1;
+}
+
+sf::Text Screen::ShowGoal(double goal){
+    stringstream c;
+    c << fixed << setprecision(0) << goal;
+    sf::Text Text(font,"GOAL : "+c.str(),60); 
+    sf::FloatRect bounds = Text.getLocalBounds();
+    Text.setOrigin({bounds.position.x+bounds.size.x/2,60-bounds.position.y});
+    Text.setPosition({windowSize_x*37/100,WindowSize_y*40/100});
+    Text.setOutlineColor(sf::Color::Black);
+    Text.setOutlineThickness(2.f);
+    return Text;
 }
 
 void Screen::DeleDataLast(){

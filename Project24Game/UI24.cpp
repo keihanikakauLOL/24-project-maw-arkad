@@ -5,10 +5,11 @@
 void GameSystem24();
 void ScoreBoard(const map<string, int>& data);
 void Menu();
+void GameOver();
 void Round(string,double);
 void GameRandom();
 void pauseScreen();
-void EnterName();
+string EnterName();
 Game stat;
 bool inGame24 = 0;
 sf::Texture texture_win("Images/Winnig.png");
@@ -28,6 +29,7 @@ enum Game24subState {
     NotInGame,
     InEnterName,
     InRound,
+    InGameOver,
     InPause,
 };
 
@@ -40,7 +42,6 @@ int Player_Score;
 
 int main()
 {    
-    stat.start();
     window.setFramerateLimit(144);
     createQuestions(); 
     srand(time(0));
@@ -59,6 +60,7 @@ int main()
 
 void Menu(){
     // Build Windows Frame
+    stat.start();
     Title tilte;
 
     // button24
@@ -114,7 +116,7 @@ void Menu(){
     // GameOn
     while (state == MENU)
     {
-        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) window.close();}
+        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) {stat.quit();window.close();return;}}
         window.clear();
         anim.update();
         anim.draw(window);
@@ -173,7 +175,8 @@ void GameSystem24(){
     status.streak = 0;
     Player_Score = 0;
     gameOn = InEnterName;
-    EnterName();
+    Player_Name = EnterName();
+    usleep(80000);
     int type_games = 24;
     double goal = (double)type_games;
     newCreateList(type_games);
@@ -183,7 +186,6 @@ void GameSystem24(){
         stat.resumeTimer();
         Round(setNumber,goal);
         status = stat.ChooseYourChoice();
-        // stat.pauseTimer(); // 1 1 9 4 //
         stat.pauseTimer();
         usleep(11000);
         pauseScreen();
@@ -195,7 +197,8 @@ void GameSystem24(){
     // cout << Player_Name;
 }
 
-void EnterName(){
+string EnterName(){
+    BoxName Player;
     buttonBuild EnterName = {
         .posBox_x = windowSize_x*50/100,
         .posBox_y = WindowSize_y*65/100, // 2.5 when no float was assian as double type
@@ -209,6 +212,7 @@ void EnterName(){
         };
     sf::RectangleShape EnterNameButton = EnterName.builtButton();
     while (gameOn == InEnterName){
+        window.clear();
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
         if(auto event = window.pollEvent()){
             if (event->is<sf::Event::Closed>()) window.close();
@@ -223,29 +227,70 @@ void EnterName(){
             }
             if (auto* keyPressed = event ->getIf<sf::Event::KeyPressed>()){
                 string Alpahbet = sf::Keyboard::getDescription(keyPressed->scancode).toAnsiString();
-                cout << Alpahbet;
+                Player.name += Alpahbet;
             }
         }
-        window.clear();
         window.draw(EnterNameButton);
         window.draw(EnterName.txtBox(EnterNameButton.getGeometricCenter()));
+        window.draw(Player.NameShow());
+        window.display();
+    }
+    return Player.name;
+}
+
+void GameOver(){
+    BoxName Player;
+    buttonBuild ReturnMenu= {
+        .posBox_x = windowSize_x*50/100,
+        .posBox_y = WindowSize_y*65/100, // 2.5 when no float was assian as double type
+        .FontSize = 100,
+        .buttonSize_x = 300,
+        .buttonSize_y = 150,
+        .X = 0,
+        .Y = 0,
+        .name = "Exit",
+        .ColorBox = sf::Color(255,20,52)
+        };
+    sf::RectangleShape ReturnMenuButton = ReturnMenu.builtButton();
+    while (gameOn == InGameOver){
+        window.clear();
+        auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        if(auto event = window.pollEvent()){
+            if (event->is<sf::Event::Closed>()) window.close();
+            if (ReturnMenuButton.getGlobalBounds().contains(mouse_pos)) 
+            {
+                ReturnMenuButton.setFillColor(sf::Color(44,75,22)); 
+                if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){state = MENU;gameOn = NotInGame;}
+                }
+            }else{
+                ReturnMenuButton.setFillColor(ReturnMenu.ColorBox);
+            }
+        }
+        window.draw(ReturnMenuButton);
+        window.draw(ReturnMenu.txtBox(ReturnMenuButton.getGeometricCenter()));
+        window.draw(Player.NameShow());
         window.display();
     }
 }
 
 void GameRandom(){
+    gameOn = InEnterName;
+    Player_Name = EnterName();
     while (state == RANDOM_MODE){
         int type_games = rand()%90+10;
         double goal = (double)type_games;
-        cout << goal;
         clearvector();
         newCreateList(type_games);
         gameOn = InRound; 
         string setNumber = newGetfile(); 
+        stat.resumeTimer();
         Round(setNumber,goal);
+        status = stat.ChooseYourChoice();
         stat.pauseTimer(); 
         usleep(11000);
         pauseScreen();
+        stat.resettimer();
     }
 }
 
@@ -261,8 +306,8 @@ void Round(string setNumberString,double goal){ // time
     bool hasDel = 0;
     buttonBuild number1 = {
         .posBox_x = windowSize_x*25/100,
-        .posBox_y = WindowSize_y*50/100, // 2.5 when no float was assian as double type
-        .FontSize = 75,
+        .posBox_y = WindowSize_y*60/100, // 2.5 when no float was assian as double type
+        .FontSize = 50,
         .buttonSize_x = 150,
         .buttonSize_y = 150,
         .X = 0,
@@ -272,8 +317,8 @@ void Round(string setNumberString,double goal){ // time
         };
     buttonBuild number2 = {
             .posBox_x = windowSize_x*50/100,
-            .posBox_y = WindowSize_y*50/100, // 2.5 when no float was assian as double type
-            .FontSize = 75,
+            .posBox_y = WindowSize_y*60/100, // 2.5 when no float was assian as double type
+            .FontSize = 50,
             .buttonSize_x = 150,
             .buttonSize_y = 150,
             .X = 0,
@@ -283,8 +328,8 @@ void Round(string setNumberString,double goal){ // time
         };
     buttonBuild number3 = {
             .posBox_x = windowSize_x*25/100,
-            .posBox_y = WindowSize_y*75/100, // 2.5 when no float was assian as double type
-            .FontSize = 75,
+            .posBox_y = WindowSize_y*85/100, // 2.5 when no float was assian as double type
+            .FontSize = 50,
             .buttonSize_x = 150,
             .buttonSize_y = 150,
             .X = 0,
@@ -294,8 +339,8 @@ void Round(string setNumberString,double goal){ // time
         };
     buttonBuild number4 = {
             .posBox_x = windowSize_x*50/100,
-            .posBox_y = WindowSize_y*75/100, // 2.5 when no float was assian as double type
-            .FontSize = 75,
+            .posBox_y = WindowSize_y*85/100, // 2.5 when no float was assian as double type
+            .FontSize = 50,
             .buttonSize_x = 150,
             .buttonSize_y = 150,
             .X = 0,
@@ -392,7 +437,7 @@ void Round(string setNumberString,double goal){ // time
     sf::CircleShape dele = del.Circle_builtButton(); 
     sf::CircleShape Ret = ret.Circle_builtButton(); 
     while (gameOn == InRound){
-        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) window.close();}
+        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()){stat.quit();window.close();}}
         number1.name = setNumberStr[0];
         number2.name = setNumberStr[1];
         number3.name = setNumberStr[2];
@@ -437,6 +482,8 @@ void Round(string setNumberString,double goal){ // time
         //
         window.draw(Div);
         window.draw(div.Circle_txtBox(Div.getPosition()));
+        //
+        window.draw(Display.ShowGoal(goal));
         window.draw(Display.BoxScreen());
         if (Display.NumAllowed == 1)
         {
@@ -532,6 +579,10 @@ void Round(string setNumberString,double goal){ // time
                     setNumberStr.push_back(to_string(setNumberString[i]-48));
                     setNumber[i] = (double)setNumberString[i]-48;
                 }
+                Plus.setFillColor(plus.ColorBox);
+                Mul.setFillColor(mul.ColorBox);
+                Div.setFillColor(div.ColorBox);
+                Minu.setFillColor(minu.ColorBox);
                 hasDel = 1;
                 Display.AllClear();
             }else{hasDel = 0;}
@@ -549,9 +600,9 @@ void Round(string setNumberString,double goal){ // time
             }
         }
         if (stat.getTimeLeft() == 0){
-        scoreData[Player_Name] = max(scoreData[Player_Name], status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
-        state = MENU;
-        gameOn = NotInGame;
+            scoreData[Player_Name] = max(scoreData[Player_Name], status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
+            gameOn = InGameOver;
+            GameOver();
         }       // this then GG สักอย่่างขอแก้กำ
         if (Ret.getGlobalBounds().contains(mouse_pos)) 
         {

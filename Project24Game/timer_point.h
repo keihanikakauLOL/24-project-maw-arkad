@@ -200,8 +200,8 @@ private:
 
 public:
     void start() {
-        t1 = std::thread(&Game::timer, this);
-        t3 = std::thread(&Game::endGame, this);
+        if(!t1.joinable())t1 = std::thread(&Game::timer, this);
+        if(!t3.joinable())t3 = std::thread(&Game::endGame, this);
         paused = true;
     }
 
@@ -277,6 +277,7 @@ public:
 
     void resettimer(){
         timeLeft = 30;
+        paused = true;
     }
     
     void restart() {
@@ -290,6 +291,8 @@ public:
     void quit() {
         runaway = false;
         running = false;
+        t1.join();
+        t3.join();
     }
 
     void wait() {
