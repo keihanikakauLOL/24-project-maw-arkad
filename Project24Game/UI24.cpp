@@ -8,7 +8,7 @@ void Menu();
 void Round(string,double);
 void GameRandom();
 void pauseScreen();
-string EnterName();
+void EnterName();
 Game stat;
 bool inGame24 = 0;
 sf::Texture texture_win("Images/Winnig.png");
@@ -46,15 +46,12 @@ int main()
     srand(time(0));
     while (window.isOpen())
     {
-        while (const std::optional event = window.pollEvent()){
-            if (event->is<sf::Event::Closed>()) window.close();
-            if (state == MENU){Menu();}
-            if (state == GAME24){usleep(80000);GameSystem24();}
-            if (state == RANDOM_MODE){usleep(80000);GameRandom();}
-            if (state == SCORE_BOARD){
-                usleep(80000);
-                ScoreBoard(scoreData);
-            }
+        if (state == MENU){Menu();}
+        if (state == GAME24){usleep(80000);GameSystem24();}
+        if (state == RANDOM_MODE){usleep(80000);GameRandom();}
+        if (state == SCORE_BOARD){
+            usleep(80000);
+            ScoreBoard(scoreData);
         }
     }
     
@@ -117,6 +114,7 @@ void Menu(){
     // GameOn
     while (state == MENU)
     {
+        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) window.close();}
         window.clear();
         anim.update();
         anim.draw(window);
@@ -173,9 +171,9 @@ void Menu(){
 void GameSystem24(){
     status.score = 0;
     status.streak = 0;
-    Player_Name = EnterName();// เปลี่ยนเป็น global
     Player_Score = 0;
     gameOn = InEnterName;
+    EnterName();
     int type_games = 24;
     double goal = (double)type_games;
     newCreateList(type_games);
@@ -197,10 +195,42 @@ void GameSystem24(){
     // cout << Player_Name;
 }
 
-string EnterName(){
-    string nameUser;
-    cin >> nameUser;
-    return nameUser;
+void EnterName(){
+    buttonBuild EnterName = {
+        .posBox_x = windowSize_x*50/100,
+        .posBox_y = WindowSize_y*65/100, // 2.5 when no float was assian as double type
+        .FontSize = 60,
+        .buttonSize_x = 300,
+        .buttonSize_y = 150,
+        .X = 0,
+        .Y = 0,
+        .name = "Let's Play",
+        .ColorBox = sf::Color(255,20,52)
+        };
+    sf::RectangleShape EnterNameButton = EnterName.builtButton();
+    while (gameOn == InEnterName){
+        auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        if(auto event = window.pollEvent()){
+            if (event->is<sf::Event::Closed>()) window.close();
+            if (EnterNameButton.getGlobalBounds().contains(mouse_pos)) 
+            {
+                EnterNameButton.setFillColor(sf::Color(44,75,22)); 
+                if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){gameOn = NotInGame;}
+                }
+            }else{
+                EnterNameButton.setFillColor(EnterName.ColorBox);
+            }
+            if (auto* keyPressed = event ->getIf<sf::Event::KeyPressed>()){
+                string Alpahbet = sf::Keyboard::getDescription(keyPressed->scancode).toAnsiString();
+                cout << Alpahbet;
+            }
+        }
+        window.clear();
+        window.draw(EnterNameButton);
+        window.draw(EnterName.txtBox(EnterNameButton.getGeometricCenter()));
+        window.display();
+    }
 }
 
 void GameRandom(){
@@ -362,6 +392,7 @@ void Round(string setNumberString,double goal){ // time
     sf::CircleShape dele = del.Circle_builtButton(); 
     sf::CircleShape Ret = ret.Circle_builtButton(); 
     while (gameOn == InRound){
+        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) window.close();}
         number1.name = setNumberStr[0];
         number2.name = setNumberStr[1];
         number3.name = setNumberStr[2];
@@ -581,6 +612,7 @@ void pauseScreen(){ // add steak  // score
     sf::RectangleShape buttonGo = GoNext.builtButton();
     while (gameOn == InPause)
     {
+        if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) window.close();}
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
         window.clear();
         GradiantBackground_Pause(window);
@@ -634,7 +666,8 @@ void ScoreBoard(const map<string, int>& data){
             Bar_Chart(window, data);
             window.draw(Back_Button_Rect);
             drawBackArrow(window, {25, 25}, 1.f, sf::Color::White); // draw back icon
-
+            
+            if(auto event = window.pollEvent()){if (event->is<sf::Event::Closed>()) window.close();}
             if (Back_Button_Rect.getGlobalBounds().contains(mouse_pos)) 
             {
                 Back_Button_Rect.setFillColor(sf::Color(44,75,22)); 
