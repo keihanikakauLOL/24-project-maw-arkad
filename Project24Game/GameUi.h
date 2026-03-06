@@ -309,16 +309,16 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
         window.draw(nameText);
 
         // STREAK 6️⃣7️⃣
-        sf::Text streakText(font, "streak :"); // รอใส่ getMaxStreak() 🤡🤡🤡🤡
-        streakText.setCharacterSize(26);
-        streakText.setFillColor(sf::Color::White);
-        streakText.setOutlineColor(sf::Color::Black);
-        streakText.setOutlineThickness(2.f);
+        //sf::Text streakText(font, "streak :" + to_string(stat.getMaxStreak())); // รอใส่ getMaxStreak() 🤡🤡🤡🤡
+        //streakText.setCharacterSize(26);
+        //streakText.setFillColor(sf::Color::White);
+        //streakText.setOutlineColor(sf::Color::Black);
+        //streakText.setOutlineThickness(2.f);
 
-        sf::FloatRect streakBounds = streakText.getLocalBounds();
-        streakText.setOrigin({streakBounds.position.x + streakBounds.size.x / 2.f,streakBounds.position.y + streakBounds.size.y / 2.f});
-        streakText.setPosition({posX, posY - 20.f});
-        window.draw(streakText);
+        //sf::FloatRect streakBounds = streakText.getLocalBounds();
+        //streakText.setOrigin({streakBounds.position.x + streakBounds.size.x / 2.f,streakBounds.position.y + streakBounds.size.y / 2.f});
+        //streakText.setPosition({posX, posY - 20.f});
+        //window.draw(streakText);
 
         // RANK CIRCLE
         sf::CircleShape circle(28.f);
