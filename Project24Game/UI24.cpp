@@ -651,7 +651,7 @@ void Round(string setNumberString,double goal){ // time
         if (Display.Order.size() == 2)
         {
             if (gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1){ //tips
-                if (true){ //abs(Display.newData-goal) < 1e-9 
+                if (abs(Display.newData-goal) < 1e-9){ //abs(Display.newData-goal) < 1e-9 
                     stat.updateStreakAndScore(true);
                     gameOn = InPause; // check part
                 }else (stat.updateStreakAndScore(false));
