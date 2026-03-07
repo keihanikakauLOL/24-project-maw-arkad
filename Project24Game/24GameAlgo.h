@@ -17,6 +17,21 @@ set<string> Allpossiblesolutions;
 vector<int> list;
 vector<int> shuff;
 vector<string> combination;
+vector<string> solutions;
+
+//Logic and Math
+bool check(double prob[], int n, int target);
+bool permutationforcheck(double prob[], int target);
+void Checksol(double problem[], string expression[], int n, int target);
+void Solvethegame(double problem[], int target);
+int closest(double problem[], int target);
+
+//Question Generation and Setup
+void createQuestions();
+void newCreateList(int target = 24);
+string newGetfile();
+void clearShuffvector();
+void clearSolvector();
 
 bool check(double prob[], int n, int target) {
     if(n == 1) {
@@ -148,23 +163,33 @@ void Checksol(double problem[], string expression[], int n, int target) {
 }
 
 void Solvethegame(double problem[], int target) {
-    string exprs[4];
 
-    sort(problem, problem + 4);
+    //check the closest number
+    int close = closest(problem, target);
+    solutions.push_back(to_string(close));
 
-    do {
-
-        for(int i = 0; i < 4; i++) {
-        // Convert initial numbers to strings
-        exprs[i] = to_string((int)problem[i]);
+    if (close == 9999) {
+        solutions.push_back("Out of bound");
     }
+    else {
+        string exprs[4];
 
-        Checksol(problem, exprs, 4, target);
+        sort(problem, problem + 4);
 
-    } while(next_permutation(problem, problem + 4));
+        do {
 
-    for (const string& s : Allpossiblesolutions) {
-        cout << s << endl;
+            for(int i = 0; i < 4; i++) {
+            // Convert initial numbers to strings
+            exprs[i] = to_string((int)problem[i]);
+        }
+
+            Checksol(problem, exprs, 4, close);
+
+        } while(next_permutation(problem, problem + 4));
+
+        for (const string& s : Allpossiblesolutions) {
+            solutions.push_back(s);
+        }
     }
 }
 
@@ -181,7 +206,7 @@ void createQuestions() {
     }
 }
 
-void newCreateList(int target = 24) {
+void newCreateList(int target) {
     double arr[4];
     for (int i = 0; i <= 714; i++) {
         for (int j = 0; j < 4; j++) {
@@ -205,8 +230,12 @@ string newGetfile() {
     return combination[shuff[count]];
 }
 
-void clearvector() {
+void clearShuffvector() {
     shuff.clear();
+}
+
+void clearSolvector() {
+    solutions.clear();
 }
 
 int closest (double problem[], int target) {
