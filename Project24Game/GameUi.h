@@ -226,6 +226,30 @@ sf::RectangleShape Screen::BoxScreen(){
     return Box;
 }
 
+class AnswerModule{
+    string allAnswer = "";
+    public:
+        void AddallAnswer(vector<string>);
+        sf::Text CreateAnsBox(); 
+};
+
+void AnswerModule::AddallAnswer(vector<string> setAnswer){  
+   for (unsigned int  i = 0; i < setAnswer.size(); i ++){
+        allAnswer += setAnswer[i]+" , ";
+   }
+}
+
+sf::Text  AnswerModule::CreateAnsBox(){
+    sf::Text Ans(font,allAnswer,100);
+    sf::FloatRect boundScreen = Ans.getLocalBounds();
+    Ans.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
+    Ans.setPosition({windowSize_x - 300.f,150});
+    Ans.setOutlineColor(sf::Color::Black);
+    Ans.setOutlineThickness(2.f);
+    return Ans;
+}
+
+
 
 void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
 {

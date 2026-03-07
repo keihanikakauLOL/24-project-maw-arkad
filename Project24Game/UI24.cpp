@@ -6,8 +6,9 @@ void GameSystem24();
 void ScoreBoard(const map<string, int>& data);
 void Menu();
 void GameOver();
-void Round(string,double);
+void Round(string,double,string);
 void GameRandom();
+void AnswerSheet(string,string);
 void pauseScreen();
 string EnterName();
 Game stat;
@@ -26,12 +27,15 @@ enum GameState { // state of game to process more easily
     SCORE_BOARD
 };
 
+
+
 enum Game24subState {
     NotInGame,
     InEnterName,
     InRound,
     InGameOver,
     InPause,
+    AnswerSheetmode
 };
 
 GameState state = MENU;
@@ -165,6 +169,54 @@ void Menu(){
     
 }
 
+void AnswerSheet(string setNum , string goal){
+    double setNumberDoubleType[4];
+    int goal_int = stoi(goal);
+    for (int i = 0;i<setNum.size();i++){setNumberDoubleType[i] = (double)setNum[i]-48;}
+    // vector<string> AnswerSet = Solvethegame(setNumberDoubleType,goal_int);
+    vector<string> AnswerSheet = {"(6+4)*(3+9)","(7+8)*(1+4)"};
+    AnswerModule AnswerBox;
+    AnswerBox.AddallAnswer(AnswerSheet);
+    buttonBuild GoNext = buttonBuild{
+        .posBox_x = windowSize_x*5/10,
+        .posBox_y = WindowSize_y*8/10, // 2.5 when no float was assian as double type
+        .FontSize = 50,
+        .buttonSize_x = 225,
+        .buttonSize_y = 100,
+        .X = 0,
+        .Y = 0,
+        .name = "GoNext",
+        .ColorBox = sf::Color(0,51,102)
+    };
+    sf::RectangleShape buttonGo = GoNext.builtButton();
+    while(gameOn == AnswerSheetmode){
+        window.clear();
+        window.draw(AnswerBox.CreateAnsBox());
+        window.draw(buttonGo);
+        window.draw(GoNext.txtBox(buttonGo.getGeometricCenter()));
+        auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        if(auto event = window.pollEvent()){
+            if (event->is<sf::Event::Closed>()){stat.quit();window.close();}
+                if (buttonGo.getGlobalBounds().contains(mouse_pos)) 
+                {
+                    buttonGo.setFillColor(sf::Color(44,75,22));
+                    if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                        if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                            gameOn = NotInGame;
+                            cout << gameOn;
+                        }
+                    }
+                }else{
+                    buttonGo.setFillColor(GoNext.ColorBox);
+                }
+        }
+        window.display();
+
+    }
+}
+
+
+
 void GameSystem24(){
     status.score = 0;
     status.streak = 0;
@@ -173,23 +225,22 @@ void GameSystem24(){
     Player_Name = EnterName();
     usleep(80000);
     int type_games = 24;
+    string goalstr = "24";
     double goal = (double)type_games;
     newCreateList(type_games);
     while (state == GAME24){ 
         gameOn = InRound; 
         string setNumber = newGetfile(); // random
         stat.resumeTimer();
-        Round(setNumber,goal);
+        Round(setNumber,goal,goalstr);
         status = stat.ChooseYourChoice();
         stat.pauseTimer();
         usleep(11000);
         pauseScreen();
         stat.resettimer();
     }
-    // cout << status.score; //return score streak ;
     Player_Score = status.score; 
-    // cout << status.streak;
-    // cout << Player_Name;
+
 }
 
 string EnterName(){
@@ -279,13 +330,14 @@ void GameRandom(){
     Player_Name = EnterName();
     while (state == RANDOM_MODE){
         int type_games = rand()%90+10;
+        string goalstr = to_string(type_games);
         double goal = (double)type_games;
         clearvector();
         newCreateList(type_games);
         gameOn = InRound; 
         string setNumber = newGetfile(); 
         stat.resumeTimer();
-        Round(setNumber,goal);
+        Round(setNumber,goal,goalstr);
         status = stat.ChooseYourChoice();
         stat.pauseTimer(); 
         usleep(11000);
@@ -294,7 +346,7 @@ void GameRandom(){
     }
 }
 
-void Round(string setNumberString,double goal){ // time 
+void Round(string setNumberString,double goal,string goalstr){ // time 
     double setNumber[4];
     vector<string> setNumberStr;
     for (int i = 0 ;i < setNumberString.size(); i++){
@@ -348,10 +400,22 @@ void Round(string setNumberString,double goal){ // time
             .name = setNumberStr[3],
             .ColorBox = sf::Color(255,20,52)
         };
+    buttonBuild AnsPop = {
+            .posBox_x = windowSize_x*90/100,
+            .posBox_y = WindowSize_y*60/100, // 2.5 when no float was assian as double type
+            .FontSize = 50,
+            .buttonSize_x = 50,
+            .buttonSize_y = 50,
+            .X = 0,
+            .Y = 0,
+            .name = "Ans",
+            .ColorBox = sf::Color(255,20,52)
+        };
     sf::RectangleShape number_1 = number1.builtButton();
     sf::RectangleShape number_2 = number2.builtButton();
     sf::RectangleShape number_3 = number3.builtButton();
     sf::RectangleShape number_4 = number4.builtButton();
+    sf::RectangleShape AnsPopButton = AnsPop.builtButton();
     Circle_buttonBuild plus = { //cic
             .posBox_x = windowSize_x*75/100,
             .posBox_y = WindowSize_y*40/100, // 2.5 when no float was assian as double type
@@ -437,7 +501,6 @@ void Round(string setNumberString,double goal){ // time
     sf::CircleShape dele = del.Circle_builtButton(); 
     sf::CircleShape Ret = ret.Circle_builtButton(); 
     while (gameOn == InRound){
-        
         number1.name = setNumberStr[0];
         number2.name = setNumberStr[1];
         number3.name = setNumberStr[2];
@@ -483,11 +546,13 @@ void Round(string setNumberString,double goal){ // time
         window.draw(Div);
         window.draw(div.Circle_txtBox(Div.getPosition()));
         //
+        window.draw(AnsPopButton);
+        window.draw(AnsPop.txtBox(AnsPopButton.getGeometricCenter()));
+        //
         window.draw(Display.ShowGoal(goal));
         window.draw(Display.BoxScreen());
         if(auto event = window.pollEvent()){
             if (event->is<sf::Event::Closed>()){stat.quit();window.close();}
-
             if (Display.NumAllowed == 1)
             {
                 if (number_1.getGlobalBounds().contains(mouse_pos)) 
@@ -588,60 +653,76 @@ void Round(string setNumberString,double goal){ // time
                         Div.setFillColor(div.ColorBox);
                     }
                 }
-        if (dele.getGlobalBounds().contains(mouse_pos)){
-            dele.setFillColor(sf::Color(44,75,22));
-            if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
-                if (mouseButtonPressed->button == sf::Mouse::Button::Left && hasDel == 0){
-                    Display.dataReset();
-                    for(int l = 0 ; l < 4; l++) gateway[l] = 0;
-                    setNumberStr.clear();
-                    for (int i = 0 ;i < setNumberString.size(); i++){
-                        setNumberStr.push_back(to_string(setNumberString[i]-48));
-                        setNumber[i] = (double)setNumberString[i]-48;
+            if (dele.getGlobalBounds().contains(mouse_pos)){
+                dele.setFillColor(sf::Color(44,75,22));
+                if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left && hasDel == 0){
+                        Display.dataReset();
+                        for(int l = 0 ; l < 4; l++) gateway[l] = 0;
+                        setNumberStr.clear();
+                        for (int i = 0 ;i < setNumberString.size(); i++){
+                            setNumberStr.push_back(to_string(setNumberString[i]-48));
+                            setNumber[i] = (double)setNumberString[i]-48;
+                        }
+                        Plus.setFillColor(plus.ColorBox);
+                        Mul.setFillColor(mul.ColorBox);
+                        Div.setFillColor(div.ColorBox);
+                        Minu.setFillColor(minu.ColorBox);
+                        hasDel = 1;
+                        Display.AllClear();
                     }
-                    Plus.setFillColor(plus.ColorBox);
-                    Mul.setFillColor(mul.ColorBox);
-                    Div.setFillColor(div.ColorBox);
-                    Minu.setFillColor(minu.ColorBox);
-                    hasDel = 1;
-                    Display.AllClear();
-                }
-            }else{hasDel = 0;}
-        }else{
-            dele.setFillColor(number4.ColorBox); 
-        }
-        if (Get_Back.getGlobalBounds().contains(mouse_pos)) 
-        {
-            Get_Back.setFillColor(sf::Color(44,75,22));
-            if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
-                if (mouseButtonPressed->button == sf::Mouse::Button::Left){
-                    window.clear();
-                    state = MENU;
-                    gameOn = NotInGame;
+                }else{hasDel = 0;}
+            }else{
+                dele.setFillColor(number4.ColorBox); 
+            }
+            if (Get_Back.getGlobalBounds().contains(mouse_pos)) 
+            {
+                Get_Back.setFillColor(sf::Color(44,75,22));
+                if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                        window.clear();
+                        state = MENU;
+                        gameOn = NotInGame;
+                    }
                 }
             }
-        }
-        if (Ret.getGlobalBounds().contains(mouse_pos)) 
-        {
-            Ret.setFillColor(sf::Color(44,75,22));
-            if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
-                if (mouseButtonPressed->button == sf::Mouse::Button::Left && Display.Order.size() > 0 && Display.NumAllowed == 0){
-                    gateway[Display.Order.back()] = 0;
-                    Display.Order.pop_back();
-                    Display.DeleDataLast();
-                    Display.NumAllowed = 1;
+            if (Ret.getGlobalBounds().contains(mouse_pos)) 
+            {
+                Ret.setFillColor(sf::Color(44,75,22));
+                if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left && Display.Order.size() > 0 && Display.NumAllowed == 0){
+                        gateway[Display.Order.back()] = 0;
+                        Display.Order.pop_back();
+                        Display.DeleDataLast();
+                        Display.NumAllowed = 1;
+                    }
+                }
+                if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left && Display.Order.size() > 0 && Display.NumAllowed == 1){
+                        Display.NumAllowed = 0;
+                        usleep(80000);
+                    }
                 }
             }
-            if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
-                if (mouseButtonPressed->button == sf::Mouse::Button::Left && Display.Order.size() > 0 && Display.NumAllowed == 1){
-                    Display.NumAllowed = 0;
-                    usleep(80000);
-                }
+            else{
+                Ret.setFillColor(ret.ColorBox);
             }
-        }else{
-            Ret.setFillColor(ret.ColorBox);
-        }
-    }   if (stat.getTimeLeft() == 0){
+            if (AnsPopButton.getGlobalBounds().contains(mouse_pos)) 
+                {
+                    AnsPopButton.setFillColor(sf::Color(44,75,22));
+                    if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                        if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                            gameOn = AnswerSheetmode;
+                            stat.updateStreakAndScore(false);
+                            stat.pauseTimer();
+                            AnswerSheet(setNumberString,goalstr);
+                        }
+                    }
+                }else{
+                    AnsPopButton.setFillColor(AnsPop.ColorBox);
+                }
+        }   
+        if (stat.getTimeLeft() == 0){
             scoreData[Player_Name] = max(scoreData[Player_Name], status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
             gameOn = InGameOver;
             GameOver();
