@@ -208,3 +208,50 @@ string newGetfile() {
 void clearvector() {
     shuff.clear();
 }
+
+int closest (double problem[], int target) {
+    if (target >= 100 || target <= 9) {
+        return 9999;
+    }
+    else if (permutationforcheck(problem, target)) {
+        return target;
+    }
+    else {
+        const int temp = target;
+        int up = 0;
+        int low = 0;
+        bool foundUp = false;
+        bool foundLow = false;
+        
+        while (temp + up < 100) {
+            up++;
+            if (permutationforcheck(problem, temp + up)) {
+                foundUp = true;
+                break;
+            }
+        }
+        while (temp - low > 0) {
+            low++;
+            if (permutationforcheck(problem, temp - low)) {
+                foundLow = true;
+                break;
+            }
+        }
+
+        if (foundUp && foundLow) {
+            if (up >= low) {
+                return temp - low;
+            }
+            else {
+                return temp + up;
+            }
+        }
+        else if (foundUp) {
+            return temp + up;
+        }
+        else if (foundLow) {
+            return temp - low;
+        }
+        return 9999;
+    }
+}
