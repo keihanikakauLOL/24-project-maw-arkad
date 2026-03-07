@@ -252,14 +252,14 @@ int closest (double problem[], int target) {
         bool foundUp = false;
         bool foundLow = false;
         
-        while (temp + up < 100) {
+        while (temp + up < 99) {
             up++;
             if (permutationforcheck(problem, temp + up)) {
                 foundUp = true;
                 break;
             }
         }
-        while (temp - low > 0) {
+        while (temp - low > 10) {
             low++;
             if (permutationforcheck(problem, temp - low)) {
                 foundLow = true;
