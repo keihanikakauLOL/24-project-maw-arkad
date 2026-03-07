@@ -11,19 +11,27 @@ struct Node {
     Node *left = nullptr;
     Node *right = nullptr;
 
-    Node(string v) : value(v) {}
-    ~Node() {
-        delete left;
-        delete right;
+    //Constructor
+    Node(string v) {
+        value = v;
     }
-};
 
-class ExpressionProcess {
-    public:
-        set <string> Unique(const set <string>& input) {
-            set <string> result;
-            for (const string& expr : input) {
-                result.insert(normalize(expr))
+    //Cummulative Property
+    string cummulative() {
+        if(!left && !right) {
+            return value;
+        }
+
+        string leftString = left->cummulative();
+        string rightString = right->cummulative();
+
+        //swap
+        if(value == "+" || value == "*") {
+            if (leftString > rightString) {
+                swap(leftString, rightString);
             }
         }
-}
+
+        return "(" + leftString + value + rightString + ")";
+    }
+};
