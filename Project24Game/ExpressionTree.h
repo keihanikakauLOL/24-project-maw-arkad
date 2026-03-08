@@ -11,28 +11,44 @@ struct Node {
     Node *left = nullptr;
     Node *right = nullptr;
 
-    //Constructor
-    Node(string v) {
-        value = v;
+    Node(string v) : value(v) {}
+
+    //ดึงตัวประกอบทั้งหมดของเครื่องหมายเดียวกันออกมา
+    void collect(string op, vector<string>& parts) {
+        if (value == op) {
+            if (left) {
+                left->collect(op, parts);
+            }
+
+            if (right) {
+                right->collect(op, parts);
+            }
+        } else {
+            // ถ้าเป็นเครื่องหมายอื่น หรือเป็นตัวเลข ให้เรียก cummulative() ของตัวมันเอง
+            parts.push_back(cummulative());
+        }
     }
 
-    //Cummulative Property
     string cummulative() {
-        if(!left && !right) {
-            return value;
-        }
+        if (!left && !right) return value;
 
-        string leftString = left->cummulative();
-        string rightString = right->cummulative();
+        // ถ้าเป็นเครื่องหมายที่สลับที่และจัดหมู่ได้ (+ หรือ *)
+        if (value == "+" || value == "*") {
+            vector<string> parts;
+            collect(value, parts); // ยุบกิ่งเอาลูกหลานทั้งหมดมาใส่ vector
+            sort(parts.begin(), parts.end()); // เรียงลำดับลูกหลานทั้งหมด (เช่น 1, 2, 3, 4)
 
-        //swap
-        if(value == "+" || value == "*") {
-            if (leftString > rightString) {
-                swap(leftString, rightString);
+            string result = "(";
+            for (size_t i = 0; i < parts.size(); i++) {
+                result += parts[i];
+                if (i < parts.size() - 1) result += value;
             }
+            result += ")";
+            return result;
         }
 
-        return "(" + leftString + value + rightString + ")";
+        // สำหรับ - และ / ให้ทำงานแบบเดิม (สลับที่ไม่ได้)
+        return "(" + left->cummulative() + value + right->cummulative() + ")";
     }
 };
 

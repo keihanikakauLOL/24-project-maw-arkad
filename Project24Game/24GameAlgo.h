@@ -1,3 +1,4 @@
+#include "ExpressionTree.h"
 #include <iostream>
 #include <algorithm>
 #include <cmath>
@@ -106,7 +107,8 @@ bool permutationforcheck (double prob[], int target) {
 void Checksol(double problem[], string expression[], int n, int target) {
     if(n == 1) {
         if (abs(problem[0] - target) < verysmall) {
-            Allpossiblesolutions.insert(expression[0]);
+            Node* tree = buildTree(expression[0]);
+            Allpossiblesolutions.insert(tree->cummulative());
         }
     }
 
@@ -164,6 +166,7 @@ void Checksol(double problem[], string expression[], int n, int target) {
 
 void Solvethegame(double problem[], int target) {
     Allpossiblesolutions.clear();
+    solutions.clear();
 
     //check the closest number
     int close = closest(problem, target);
@@ -174,19 +177,11 @@ void Solvethegame(double problem[], int target) {
     }
     else {
         string exprs[4];
-
-        sort(problem, problem + 4);
-
-        do {
-
-            for(int i = 0; i < 4; i++) {
-            // Convert initial numbers to strings
+        for(int i = 0; i < 4; i++) {
             exprs[i] = to_string((int)problem[i]);
         }
 
-            Checksol(problem, exprs, 4, close);
-
-        } while(next_permutation(problem, problem + 4));
+        Checksol(problem, exprs, 4, close);
 
         for (const string& s : Allpossiblesolutions) {
             solutions.push_back(s);
