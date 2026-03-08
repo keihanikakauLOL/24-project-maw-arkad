@@ -231,11 +231,14 @@ class AnswerModule{
     string allAnswer = "";
     string ansgo = "";
     string realgoal = "";
+    vector<string> lines;
     public:
         void AddallAnswer(vector<string>,string);
-        sf::Text CreateAnsBox(); 
+        void DrawAnswers(sf::RenderWindow& window, float offsetY);
+        //sf::Text CreateAnsBox(); 
         sf::Text CreateAnsBoxTopic();
         void ClearAns();
+        int getLineCount() const { return lines.size(); }
 };
 
 void AnswerModule::ClearAns(){
@@ -243,17 +246,42 @@ void AnswerModule::ClearAns(){
     ansgo = "";
 }
 
+
 void AnswerModule::AddallAnswer(vector<string> setAnswer,string realgo){  
     ansgo = setAnswer[0];
     realgoal = realgo;
+    lines.clear();
+
+    string line;
     for (unsigned int  i = 1; i < setAnswer.size(); i ++){
-            allAnswer += setAnswer[i];
-            if (i % 3 == 0){allAnswer += "\n";}
-            else {allAnswer += " , ";}
+            line += setAnswer[i];
+            //allAnswer += setAnswer[i];
+            if (i % 3 == 0){
+                lines.push_back(line);
+                line = "";
+            }
+            else {line += " , ";}
+    }
+    if(line != "")
+        lines.push_back(line);
+}
+
+void AnswerModule::DrawAnswers(sf::RenderWindow& window, float offsetY)
+{
+    float startY = 200 + offsetY;
+
+    for(int i = 0; i < lines.size(); i++)
+    {
+        sf::Text text(font, lines[i], 30);
+        text.setPosition({100, startY + i * 40});
+        text.setFillColor(sf::Color::White);
+        text.setOutlineColor(sf::Color::Black);
+        text.setOutlineThickness(2.f);
+        window.draw(text);
     }
 }
 
-sf::Text  AnswerModule::CreateAnsBox(){
+/*sf::Text  AnswerModule::CreateAnsBox(){
     sf::Text Ans(font,allAnswer,30);
     sf::FloatRect boundScreen = Ans.getLocalBounds();
     Ans.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
@@ -261,7 +289,7 @@ sf::Text  AnswerModule::CreateAnsBox(){
     Ans.setOutlineColor(sf::Color::Black);
     Ans.setOutlineThickness(2.f);
     return Ans;
-}
+}*/
 
 sf::Text  AnswerModule::CreateAnsBoxTopic(){
     string RealText;
@@ -270,25 +298,28 @@ sf::Text  AnswerModule::CreateAnsBoxTopic(){
     sf::Text Ansb(font,RealText,50);
     sf::FloatRect boundScreen = Ansb.getLocalBounds();
     Ansb.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
-    Ansb.setPosition({windowSize_x*40/100,100});
+    Ansb.setPosition({windowSize_x*50/100,150});
     Ansb.setOutlineColor(sf::Color::Black);
     Ansb.setOutlineThickness(2.f);
     return Ansb;
 }
 
+struct Player_Data{
+    int Player_Score = 0;
+    int Player_Streak = 0;
+};
 
-
-void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
+void Bar_Chart(sf::RenderWindow& window, const map<string, Player_Data>& data)
 {
-    vector<pair<string,int>> sortedData(data.begin(), data.end());
+    vector<pair<string, Player_Data>> sortedData(data.begin(), data.end());
     sort(sortedData.begin(), sortedData.end(),[](const auto& a, const auto& b)
      {
-         return a.second > b.second; // มากไปน้อย
+         return a.second.Player_Score > b.second.Player_Score; // มากไปน้อย
      });
     int Top_THREE = min(3, (int)sortedData.size());
     if (sortedData.empty())return;
 
-    int data_max = sortedData[0].second;
+    int data_max = sortedData[0].second.Player_Score;
     // size of window
         float window_w = static_cast<float>(window.getSize().x);
         float window_h = static_cast<float>(window.getSize().y);
@@ -313,7 +344,8 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
     {
         int dataIndex = podiumOrder[i];
         if (dataIndex >= sortedData.size())continue;
-        auto& [name, point] = sortedData[dataIndex];
+        auto& [name, pData] = sortedData[dataIndex];
+        int point = pData.Player_Score;
         float barHeight = point * scale;
 
         // ทำ podium effect (แท่งกลางสูงกว่า)
@@ -360,16 +392,16 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, int>& data)
         window.draw(nameText);
 
         // STREAK 6️⃣7️⃣
-        //sf::Text streakText(font, "streak :" + to_string(stat.getMaxStreak())); // รอใส่ getMaxStreak() 🤡🤡🤡🤡
-        //streakText.setCharacterSize(26);
-        //streakText.setFillColor(sf::Color::White);
-        //streakText.setOutlineColor(sf::Color::Black);
-        //streakText.setOutlineThickness(2.f);
+        sf::Text streakText(font, "streak : " + to_string(pData.Player_Streak)); // รอใส่ getMaxStreak() 🤡🤡🤡🤡
+        streakText.setCharacterSize(26);
+        streakText.setFillColor(sf::Color::White);
+        streakText.setOutlineColor(sf::Color::Black);
+        streakText.setOutlineThickness(2.f);
 
-        //sf::FloatRect streakBounds = streakText.getLocalBounds();
-        //streakText.setOrigin({streakBounds.position.x + streakBounds.size.x / 2.f,streakBounds.position.y + streakBounds.size.y / 2.f});
-        //streakText.setPosition({posX, posY - 20.f});
-        //window.draw(streakText);
+        sf::FloatRect streakBounds = streakText.getLocalBounds();
+        streakText.setOrigin({streakBounds.position.x + streakBounds.size.x / 2.f,streakBounds.position.y + streakBounds.size.y / 2.f});
+        streakText.setPosition({posX, posY - 20.f});
+        window.draw(streakText);
 
         // RANK CIRCLE
         sf::CircleShape circle(28.f);
@@ -626,4 +658,13 @@ void EnterName_Text(sf::RenderWindow& window){
     EnterName.setOrigin({EnterNameBounds.position.x + EnterNameBounds.size.x / 2.f,EnterNameBounds.position.y + EnterNameBounds.size.y / 2.f});
     EnterName.setPosition({windowSize_x/2, 200});
     window.draw(EnterName);
+}
+
+void Behind_AnswerText(sf::RenderWindow &window){
+    sf::RectangleShape AnsRectangle;
+    AnsRectangle.setFillColor(sf::Color(0,102,102));
+    AnsRectangle.setSize({800.f, 100.f});
+    AnsRectangle.setOrigin(AnsRectangle.getGeometricCenter());
+    AnsRectangle.setPosition({windowSize_x*50/100,100});
+    window.draw(AnsRectangle);
 }

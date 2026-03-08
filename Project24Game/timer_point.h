@@ -103,7 +103,12 @@ public:
         int streak;
         int timeLeft;
     };
-    
+    void loadPlayerData(int scoreVal, int streakVal) {
+    score = scoreVal;
+    streak = streakVal;
+    scoremax = scoreVal;
+    streakmax = streakVal;
+    }
     void updateStreakAndScore(bool isCorrect) {
         if (!running) return;
 
@@ -160,7 +165,6 @@ private:
                 std::cout << "\r[Time Left: " << timeLeft << "s] " << std::flush;
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 timeLeft--;
-
                 if (timeLeft <= 0) {
                     timeLeft = 0;
                     timerout();
@@ -177,8 +181,6 @@ private:
                 std::cout << "\n\n--- TIME'S UP! ---";
                 std::cout << "\nFinal Score: " << score << "\n";
                 timeout = false;
-                streak = 0;
-                score = 0; // thiw เพิ่มเอง score มันไม่รีเซ็ตตอนหมดเวลา
             }
 
             if (restartFlag) {

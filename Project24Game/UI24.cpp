@@ -1,9 +1,9 @@
 #include "GameUi.h"
 #include "24GameAlgo.h"
 #include "timer_point.h"
+#include "TextSaver.h"
 
 void GameSystem24();
-void ScoreBoard(const map<string, int>& data);
 void Menu();
 void GameOver();
 void Round(string,double,string);
@@ -19,6 +19,7 @@ sf::RenderWindow window(sf::VideoMode({800,800}), "GAME24"); //Create window var
 Animation anim("BG", "Menu", "jpg", 25);
 Animation anim_OverBG("GameOverBG", "gameOver ", "png", 26);
 sf::Clock gameClock;
+
 
 enum GameState { // state of game to process more easily
     MENU,
@@ -41,12 +42,13 @@ enum Game24subState {
 GameState state = MENU;
 Game24subState gameOn = NotInGame; 
 Game::GameState status = stat.ChooseYourChoice();
-map<string, int> scoreData;
 string Player_Name;
-int Player_Score;
+map<string, Player_Data> scoreData;
+void ScoreBoard(const map<string, Player_Data>& data);
 
 int main()
 {    
+    
     window.setFramerateLimit(144);
     createQuestions(); 
     srand(time(0));
@@ -56,11 +58,7 @@ int main()
         if (state == GAME24){usleep(80000);GameSystem24();}
         if (state == RANDOM_MODE){usleep(80000);GameRandom();}
         if (state == SCORE_BOARD){
-            map<string, int> scoreData = {
-                {"ARM",55},
-                {"MING",60},
-                {"THIW",35}
-            };
+            
             usleep(80000);
             ScoreBoard(scoreData);
         }
@@ -190,15 +188,33 @@ void AnswerSheet(string setNum , string goal){
         .ColorBox = sf::Color(0,51,102)
     };
     sf::RectangleShape buttonGo = GoNext.builtButton();
+    sf::View scrollView = window.getDefaultView();
+    float scrollOffset = 0;
+    
     while(gameOn == AnswerSheetmode){
         window.clear();
-        window.draw(AnswerBox.CreateAnsBox());
+        window.setView(scrollView);
+        GradiantBackground_Pause(window);
+        //window.draw(AnswerBox.CreateAnsBox());
+        AnswerBox.DrawAnswers(window, scrollOffset);
+        Behind_AnswerText(window);
         window.draw(AnswerBox.CreateAnsBoxTopic());
         window.draw(buttonGo);
         window.draw(GoNext.txtBox(buttonGo.getGeometricCenter()));
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
         if(auto event = window.pollEvent()){
             if (event->is<sf::Event::Closed>()){stat.quit();window.close();}
+            if(const auto* wheel = event->getIf<sf::Event::MouseWheelScrolled>()){// test scrolling
+                        scrollOffset += wheel->delta*40;
+                        float maxScroll = 300;
+                        float minScroll = -(AnswerBox.getLineCount() * 40 - 600);
+                        if(minScroll > 0) minScroll = 0;
+                        if(scrollOffset > maxScroll)
+                            scrollOffset = maxScroll;
+
+                        if(scrollOffset < minScroll)
+                            scrollOffset = minScroll;
+            }
                 if (buttonGo.getGlobalBounds().contains(mouse_pos)) 
                 {
                     buttonGo.setFillColor(sf::Color(44,75,22));
@@ -207,6 +223,7 @@ void AnswerSheet(string setNum , string goal){
                             gameOn = NotInGame;
                         }
                     }
+
                 }else{
                     buttonGo.setFillColor(GoNext.ColorBox);
                 }
@@ -218,11 +235,17 @@ void AnswerSheet(string setNum , string goal){
 
 
 void GameSystem24(){
-    status.score = 0;
-    status.streak = 0;
-    Player_Score = 0;
     gameOn = InEnterName;
     Player_Name = EnterName();
+    stat.resettimer();
+    if(scoreData.count(Player_Name) > 0){
+        Player_Data &p = scoreData[Player_Name];
+        stat.loadPlayerData(p.Player_Score, p.Player_Streak);  // เล่นต่อ
+    }
+    else{
+        scoreData[Player_Name] = {0,0};
+        stat.loadPlayerData(0,0); // ผู้เล่นใหม่
+    }
     usleep(80000);
     int type_games = 24;
     string goalstr = "24";
@@ -239,8 +262,6 @@ void GameSystem24(){
         pauseScreen();
         stat.resettimer();
     }
-    Player_Score = status.score; 
-
 }
 
 string EnterName(){
@@ -328,6 +349,15 @@ void GameOver(){
 void GameRandom(){
     gameOn = InEnterName;
     Player_Name = EnterName();
+    if(scoreData.count(Player_Name) > 0){
+    Player_Data &p = scoreData[Player_Name];
+        stat.loadPlayerData(p.Player_Score, p.Player_Streak);
+    }
+    else{
+        scoreData[Player_Name] = {0,0};
+        stat.loadPlayerData(0,0);
+    }
+    usleep(80000);
     while (state == RANDOM_MODE){
         int type_games = rand()%90+10;
         string goalstr = to_string(type_games);
@@ -347,6 +377,7 @@ void GameRandom(){
 }
 
 void Round(string setNumberString,double goal,string goalstr){ // time 
+    window.clear();
     double setNumber[4];
     vector<string> setNumberStr;
     for (int i = 0 ;i < setNumberString.size(); i++){
@@ -681,6 +712,11 @@ void Round(string setNumberString,double goal,string goalstr){ // time
                 if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
                     if (mouseButtonPressed->button == sf::Mouse::Button::Left){
                         window.clear();
+                        status = stat.ChooseYourChoice();
+                        scoreData[Player_Name].Player_Score = max(scoreData[Player_Name].Player_Score, status.score);
+                        scoreData[Player_Name].Player_Streak = max(scoreData[Player_Name].Player_Streak, status.streak);
+                        saveFullScoreToFile("scoreboard.txt", Player_Name, status.score, status.streak);
+
                         state = MENU;
                         gameOn = NotInGame;
                     }
@@ -723,7 +759,13 @@ void Round(string setNumberString,double goal,string goalstr){ // time
                 }
         }   
         if (stat.getTimeLeft() == 0){
-            scoreData[Player_Name] = max(scoreData[Player_Name], status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
+            status = stat.ChooseYourChoice();
+            scoreData[Player_Name].Player_Score = max(scoreData[Player_Name].Player_Score, status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
+            scoreData[Player_Name].Player_Streak = max(scoreData[Player_Name].Player_Streak, status.streak);
+            saveFullScoreToFile("scoreboard.txt", Player_Name, status.score, status.streak);
+            stat.loadPlayerData(0,0);   // reset score และ streak
+            status.score = 0;
+            status.streak = 0;
             gameOn = InGameOver;
             GameOver();
         } 
@@ -732,8 +774,9 @@ void Round(string setNumberString,double goal,string goalstr){ // time
         if (Display.Order.size() == 2)
         {
             if (gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1){ //tips
-                if (abs(Display.newData-goal) < 1e-9){ //abs(Display.newData-goal) < 1e-9 
+                if (true){ //abs(Display.newData-goal) < 1e-9 
                     stat.updateStreakAndScore(true);
+                    
                     gameOn = InPause; // check part
                 }else (stat.updateStreakAndScore(false));
             }
@@ -768,9 +811,11 @@ void pauseScreen(){ // add steak  // score
         .ColorBox = sf::Color(0,51,102)
     };
     sf::RectangleShape buttonGo = GoNext.builtButton();
+    scoreData[Player_Name].Player_Score = max(scoreData[Player_Name].Player_Score, status.score);
+    scoreData[Player_Name].Player_Streak = max(scoreData[Player_Name].Player_Streak, status.streak);
+    saveFullScoreToFile("scoreboard.txt", Player_Name, status.score, status.streak);
     while (gameOn == InPause)
     {
-        
         window.clear();
         GradiantBackground_Pause(window);
         float offset = fmod(gameClock.getElapsedTime().asSeconds()*60.f, 40.f);
@@ -805,7 +850,7 @@ void pauseScreen(){ // add steak  // score
 }
 
 
-void ScoreBoard(const map<string, int>& data){
+void ScoreBoard(const map<string, Player_Data>& data){
     sprite_win.setPosition({0, 0});
     sprite_win.setScale({800.f / texture_win.getSize().x, 800.f / texture_win.getSize().y});
     Screen Display;
