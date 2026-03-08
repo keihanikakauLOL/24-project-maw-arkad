@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <map>
 #include <unistd.h>
+#include<iostream>
 
 using namespace std;
 
@@ -228,25 +229,51 @@ sf::RectangleShape Screen::BoxScreen(){
 
 class AnswerModule{
     string allAnswer = "";
+    string ansgo = "";
+    string realgoal = "";
     public:
-        void AddallAnswer(vector<string>);
+        void AddallAnswer(vector<string>,string);
         sf::Text CreateAnsBox(); 
+        sf::Text CreateAnsBoxTopic();
+        void ClearAns();
 };
 
-void AnswerModule::AddallAnswer(vector<string> setAnswer){  
-   for (unsigned int  i = 0; i < setAnswer.size(); i ++){
-        allAnswer += setAnswer[i]+" , ";
-   }
+void AnswerModule::ClearAns(){
+    allAnswer = "";
+    ansgo = "";
+}
+
+void AnswerModule::AddallAnswer(vector<string> setAnswer,string realgo){  
+    ansgo = setAnswer[0];
+    realgoal = realgo;
+    for (unsigned int  i = 1; i < setAnswer.size(); i ++){
+            allAnswer += setAnswer[i];
+            if (i % 3 == 0){allAnswer += "\n";}
+            else {allAnswer += " , ";}
+    }
 }
 
 sf::Text  AnswerModule::CreateAnsBox(){
-    sf::Text Ans(font,allAnswer,100);
+    sf::Text Ans(font,allAnswer,30);
     sf::FloatRect boundScreen = Ans.getLocalBounds();
     Ans.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
-    Ans.setPosition({windowSize_x - 300.f,150});
+    Ans.setPosition({windowSize_x*40/100,200});
     Ans.setOutlineColor(sf::Color::Black);
     Ans.setOutlineThickness(2.f);
     return Ans;
+}
+
+sf::Text  AnswerModule::CreateAnsBoxTopic(){
+    string RealText;
+    if (ansgo == realgoal){RealText += "Your Target = " + ansgo;}
+    else{RealText += "Your Nearest Target = " + ansgo;}
+    sf::Text Ansb(font,RealText,50);
+    sf::FloatRect boundScreen = Ansb.getLocalBounds();
+    Ansb.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
+    Ansb.setPosition({windowSize_x*40/100,100});
+    Ansb.setOutlineColor(sf::Color::Black);
+    Ansb.setOutlineThickness(2.f);
+    return Ansb;
 }
 
 
