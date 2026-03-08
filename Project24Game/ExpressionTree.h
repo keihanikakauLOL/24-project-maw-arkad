@@ -35,8 +35,8 @@ struct Node {
         // ถ้าเป็นเครื่องหมายที่สลับที่และจัดหมู่ได้ (+ หรือ *)
         if (value == "+" || value == "*") {
             vector<string> parts;
-            collect(value, parts); // ยุบกิ่งเอาลูกหลานทั้งหมดมาใส่ vector
-            sort(parts.begin(), parts.end()); // เรียงลำดับลูกหลานทั้งหมด (เช่น 1, 2, 3, 4)
+            collect(value, parts); // ยุบกิ่งเอามาใส่ vector
+            sort(parts.begin(), parts.end()); // เรียงลำดับ
 
             string result = "(";
             for (size_t i = 0; i < parts.size(); i++) {
