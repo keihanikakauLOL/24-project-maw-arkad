@@ -170,13 +170,14 @@ void Menu(){
 }
 
 void AnswerSheet(string setNum , string goal){
+    clearSolvector();
     double setNumberDoubleType[4];
     int goal_int = stoi(goal);
     for (int i = 0;i<setNum.size();i++){setNumberDoubleType[i] = (double)setNum[i]-48;}
-    // vector<string> AnswerSet = Solvethegame(setNumberDoubleType,goal_int);
-    vector<string> AnswerSheet = {"(6+4)*(3+9)","(7+8)*(1+4)"};
+    Solvethegame(setNumberDoubleType,goal_int);
     AnswerModule AnswerBox;
-    AnswerBox.AddallAnswer(AnswerSheet);
+    AnswerBox.ClearAns();
+    AnswerBox.AddallAnswer(solutions,goal);
     buttonBuild GoNext = buttonBuild{
         .posBox_x = windowSize_x*5/10,
         .posBox_y = WindowSize_y*8/10, // 2.5 when no float was assian as double type
@@ -192,6 +193,7 @@ void AnswerSheet(string setNum , string goal){
     while(gameOn == AnswerSheetmode){
         window.clear();
         window.draw(AnswerBox.CreateAnsBox());
+        window.draw(AnswerBox.CreateAnsBoxTopic());
         window.draw(buttonGo);
         window.draw(GoNext.txtBox(buttonGo.getGeometricCenter()));
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
@@ -203,7 +205,6 @@ void AnswerSheet(string setNum , string goal){
                     if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
                         if (mouseButtonPressed->button == sf::Mouse::Button::Left){
                             gameOn = NotInGame;
-                            cout << gameOn;
                         }
                     }
                 }else{
@@ -211,7 +212,6 @@ void AnswerSheet(string setNum , string goal){
                 }
         }
         window.display();
-
     }
 }
 
@@ -231,7 +231,7 @@ void GameSystem24(){
     while (state == GAME24){ 
         gameOn = InRound; 
         string setNumber = newGetfile(); // random
-        stat.resumeTimer();
+        stat.resumeTimer(); 
         Round(setNumber,goal,goalstr);
         status = stat.ChooseYourChoice();
         stat.pauseTimer();
@@ -332,7 +332,7 @@ void GameRandom(){
         int type_games = rand()%90+10;
         string goalstr = to_string(type_games);
         double goal = (double)type_games;
-        clearvector();
+        clearShuffvector();
         newCreateList(type_games);
         gameOn = InRound; 
         string setNumber = newGetfile(); 
