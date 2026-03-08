@@ -163,6 +163,7 @@ void Checksol(double problem[], string expression[], int n, int target) {
 }
 
 void Solvethegame(double problem[], int target) {
+    Allpossiblesolutions.clear();
 
     //check the closest number
     int close = closest(problem, target);

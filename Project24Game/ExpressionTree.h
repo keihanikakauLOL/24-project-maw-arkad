@@ -35,3 +35,58 @@ struct Node {
         return "(" + leftString + value + rightString + ")";
     }
 };
+
+void buildSubBinarytree(stack<Node*>& nodes, stack<char>& op) {
+    Node* right = nodes.top();
+    nodes.pop();
+
+    Node* left = nodes.top();
+    nodes.pop();
+
+    char charOp = op.top();
+    op.pop();
+
+    //build a new sub tree
+    Node* newNode = new Node(string(1, charOp));
+    newNode->left = left;
+    newNode->right = right;
+    nodes.push(newNode);
+}
+
+Node* buildTree(string exp) {
+    stack<Node*> nodes;
+    stack<char> ops;
+
+    for (int i = 0; i < exp.length(); i++) {
+        //number
+        if (isdigit(exp[i])) {
+            string val = "";
+            while (i < exp.length() && isdigit(exp[i])) {
+                val += exp[i++];
+            }
+            nodes.push(new Node(val));
+            i--; 
+        } 
+        else if (exp[i] == '(') {
+            //starting point
+            ops.push('(');
+        } 
+        else if (exp[i] == ')') {
+            while (!ops.empty() && ops.top() != '(') {
+                buildSubBinarytree(nodes, ops);
+            }
+            if (!ops.empty()) ops.pop(); // เอา ( ออก
+        } 
+        else {
+            //+, -, *, /
+            ops.push(exp[i]);
+        }
+    }
+    
+    // กันเหนียว
+    while (!ops.empty()) {
+        buildSubBinarytree(nodes, ops);
+    }
+    
+    return nodes.top();
+}
