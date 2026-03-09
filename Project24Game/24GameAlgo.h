@@ -186,7 +186,7 @@ void Solvethegame(double problem[], int target) {
         exprs[i] = to_string((int)problem[i]);
     }
 
-    Checksol(problem, exprs, 4, target);
+    Checksol(problem, exprs, 4, close);
 
     for (const string& s : Allpossiblesolutions) {
         solutions.push_back(s);
