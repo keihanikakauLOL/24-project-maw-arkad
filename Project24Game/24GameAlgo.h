@@ -181,15 +181,20 @@ void Solvethegame(double problem[], int target) {
     int close = closest(problem, target);
     solutions.push_back(to_string(close));
 
-    string exprs[4];
-    for(int i = 0; i < 4; i++) {
-        exprs[i] = to_string((int)problem[i]);
+    if (close == 9999) {
+        solutions.push_back("Out of bound");
     }
+    else {
+        string exprs[4];
+        for(int i = 0; i < 4; i++) {
+            exprs[i] = to_string((int)problem[i]);
+        }
 
-    Checksol(problem, exprs, 4, close);
+        Checksol(problem, exprs, 4, close);
 
-    for (const string& s : Allpossiblesolutions) {
-        solutions.push_back(s);
+        for (const string& s : Allpossiblesolutions) {
+            solutions.push_back(s);
+        }
     }
 }
 
