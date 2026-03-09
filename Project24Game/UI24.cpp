@@ -278,6 +278,18 @@ void AnswerMode(){
         .ColorBox = sf::Color(255,20,52)
         };
     sf::RectangleShape CalButton = Cal.builtButton();
+    Circle_buttonBuild GetBack = { // cic
+            .posBox_x = 25,
+            .posBox_y = 25, // 2.5 when no float was assian as double type
+            .FontSize = 20,
+            .Radius = 25,
+            .PointinCircle = 100,
+            .X = 0,
+            .Y = 0,
+            .name = "",
+            .ColorBox = sf::Color(255,20,52)
+        };
+    sf::CircleShape Get_Back = GetBack.Circle_builtButton();
     while (state == AnswerState){
         window.clear();
         auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
@@ -308,11 +320,25 @@ void AnswerMode(){
                     Number.name += " ";
                 }
             }
+            if (Get_Back.getGlobalBounds().contains(mouse_pos)) 
+            {
+                Get_Back.setFillColor(sf::Color(44,75,22));
+                if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+                        window.clear();
+                        state = MENU;
+                        gameOn = NotInGame;
+                    }
+                }
+            }
             
         }
         GradiantBackground_Game24(window);
         EnterName_Text(window,"- - ENTER YOUR NUM - -");
         window.draw(CalButton);
+        window.draw(Get_Back);
+        window.draw(GetBack.Circle_txtBox(Get_Back.getPosition()));
+        drawBackArrow(window, {25, 25}, 1.f, sf::Color::White);
         window.draw(Cal.txtBox(CalButton.getGeometricCenter()));
         window.draw(Number.NameShow());
         window.display();
@@ -852,9 +878,8 @@ void Round(string setNumberString,double goal,string goalstr){ // time
         if (Display.Order.size() == 2)
         {
             if (gateway[0] == 1 && gateway[1] == 1 && gateway[2] == 1 && gateway[3] == 1){ //tips
-                if (true){ //abs(Display.newData-goal) < 1e-9 
+                if (abs(Display.newData-goal) < 1e-9 ){ //abs(Display.newData-goal) < 1e-9 
                     stat.updateStreakAndScore(true);
-                    
                     gameOn = InPause; // check part
                 }else (stat.updateStreakAndScore(false));
             }
