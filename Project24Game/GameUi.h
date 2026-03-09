@@ -674,7 +674,7 @@ void EnterName_Text(sf::RenderWindow& window, string s){
 
 void Behind_AnswerText(sf::RenderWindow &window){
     sf::RectangleShape AnsRectangle;
-    AnsRectangle.setFillColor(sf::Color(0,102,102));
+    AnsRectangle.setFillColor(sf::Color(0,0,0, 70));
     AnsRectangle.setSize({800.f, 100.f});
     AnsRectangle.setOrigin(AnsRectangle.getGeometricCenter());
     AnsRectangle.setPosition({windowSize_x*50/100,100});
