@@ -178,7 +178,8 @@ void Solvethegame(double problem[], int target) {
     Allpossiblesolutions.clear();
     solutions.clear();    
 
-    solutions.push_back(to_string(target));
+    int close = closest(problem, target);
+    solutions.push_back(to_string(close));
 
     string exprs[4];
     for(int i = 0; i < 4; i++) {
