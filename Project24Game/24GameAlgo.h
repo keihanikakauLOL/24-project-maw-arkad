@@ -13,7 +13,7 @@
 #include <iterator>
 using namespace std;
 
-const double verysmall = 1e-9;
+const double verysmall = 1e-4;
 set<string> Allpossiblesolutions;
 vector<int> list;
 vector<int> shuff;
@@ -171,26 +171,24 @@ void Checksol(double problem[], string expression[], int n, int target) {
 
 void Solvethegame(double problem[], int target) {
     Allpossiblesolutions.clear();
-    solutions.clear();
+    solutions.clear();    
 
-    //check the closest number
-    int close = closest(problem, target);
-    solutions.push_back(to_string(close));
+    solutions.push_back(to_string(target));
 
-    if (close == 9999) {
-        solutions.push_back("Out of bound");
-    }
-    else {
+    double tempProb[4];
+    for(int i = 0; i < 4; i++) tempProb[i] = problem[i];
+    sort(tempProb, tempProb + 4);
+
+    do {
         string exprs[4];
         for(int i = 0; i < 4; i++) {
-            exprs[i] = to_string((int)problem[i]);
+            exprs[i] = to_string((int)tempProb[i]);
         }
+        Checksol(tempProb, exprs, 4, target);
+    } while(next_permutation(tempProb, tempProb + 4));
 
-        Checksol(problem, exprs, 4, close);
-
-        for (const string& s : Allpossiblesolutions) {
-            solutions.push_back(s);
-        }
+    for (const string& s : Allpossiblesolutions) {
+        solutions.push_back(s);
     }
 }
 
@@ -210,13 +208,19 @@ void createQuestions() {
 void newCreateList(int target) {
     double arr[4];
     for (int i = 0; i <= 714; i++) {
+        string temp = combination[i];
         for (int j = 0; j < 4; j++) {
-            string temp = combination[i];
-            arr[j] = (temp[j] - '0');
+            arr[j] = (double)(temp[j] - '0');
         }
         if (permutationforcheck(arr, target)) {
                 shuff.push_back(i);
             }
+    }
+
+    if (shuff.empty()) {
+        // กรณีไม่มีเลขไหนทำ target นี้ได้เลย (เช่น target สูงมากๆ)
+        // ควรมี logic รองรับ เช่นเปลี่ยน target หรือแจ้งเตือน
+        return; 
     }
 
     random_device rd;
@@ -240,14 +244,14 @@ void clearSolvector() {
 }
 
 int closest (double problem[], int target) {
+    const int temp = target;
     if (target >= 100 || target <= 9) {
         return 9999;
     }
     else if (permutationforcheck(problem, target)) {
-        return target;
+        return temp;
     }
     else {
-        const int temp = target;
         int up = 0;
         int low = 0;
         bool foundUp = false;
