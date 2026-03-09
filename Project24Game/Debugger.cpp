@@ -16,7 +16,7 @@ int main(){
         for (int i = 0;i<setNumber.size();i++){setNumberDoubleType[i] = (double)(setNumber[i]-48);}
         Solvethegame(setNumberDoubleType,goal_int);
         if (goalstr != solutions[0]){
-            cout << solutions[0] << " !=" << goalstr << "   " << setNumber << endl;
+            cout << "Game Gen : " << goalstr << " !=" << "   Can only Be solve : " << solutions[0] <<"   =>    " << setNumber << endl;
             return 0;
         }
         cout << setNumber << " = " << goal << endl;
