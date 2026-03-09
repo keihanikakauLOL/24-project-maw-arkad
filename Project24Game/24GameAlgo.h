@@ -94,13 +94,18 @@ bool check(double prob[], int n, int target) {
 }
 
 bool permutationforcheck (double prob[], int target) {
-    sort(prob, prob + 4);
+    double tempProb[4]; // สร้าง array ใหม่มารับค่า
+    for(int i=0; i<4; i++) {
+        tempProb[i] = prob[i];
+    }
+
+    sort(tempProb, tempProb + 4);
 
     do {
-        if(check(prob, 4, target)) {
+        if(check(tempProb, 4, target)) {
             return true;
         }
-    } while(next_permutation(prob, prob + 4));
+    } while(next_permutation(tempProb, tempProb + 4));
     return false;
 }
 
