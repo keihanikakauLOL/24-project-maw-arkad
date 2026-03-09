@@ -13,7 +13,8 @@
 #include <iterator>
 using namespace std;
 
-const double verysmall = 1e-4;
+const double verysmall = 1e-12;
+int currentGameIndex = 0;
 set<string> Allpossiblesolutions;
 vector<int> list;
 vector<int> shuff;
@@ -82,10 +83,14 @@ bool check(double prob[], int n, int target) {
 
             // /
 
-            if(abs(b) != 0) {
-                storage[count] = a / b;
-                if (check(storage, count + 1, target)) {
-                    return true;
+            if(abs(b) > verysmall) {
+                double res = a / b;
+                if(abs(res - round(res)) < verysmall) {
+                    storage[count] = res;
+
+                    if(check(storage, count + 1, target)) {
+                        return true;
+                    }
                 }
             }
         }
@@ -175,17 +180,12 @@ void Solvethegame(double problem[], int target) {
 
     solutions.push_back(to_string(target));
 
-    double tempProb[4];
-    for(int i = 0; i < 4; i++) tempProb[i] = problem[i];
-    sort(tempProb, tempProb + 4);
+    string exprs[4];
+    for(int i = 0; i < 4; i++) {
+        exprs[i] = to_string((int)problem[i]);
+    }
 
-    do {
-        string exprs[4];
-        for(int i = 0; i < 4; i++) {
-            exprs[i] = to_string((int)tempProb[i]);
-        }
-        Checksol(tempProb, exprs, 4, target);
-    } while(next_permutation(tempProb, tempProb + 4));
+    Checksol(problem, exprs, 4, target);
 
     for (const string& s : Allpossiblesolutions) {
         solutions.push_back(s);
@@ -206,21 +206,17 @@ void createQuestions() {
 }
 
 void newCreateList(int target) {
+    shuff.clear();
     double arr[4];
     for (int i = 0; i <= 714; i++) {
         string temp = combination[i];
         for (int j = 0; j < 4; j++) {
             arr[j] = (double)(temp[j] - '0');
         }
-        if (permutationforcheck(arr, target)) {
-                shuff.push_back(i);
-            }
-    }
 
-    if (shuff.empty()) {
-        // กรณีไม่มีเลขไหนทำ target นี้ได้เลย (เช่น target สูงมากๆ)
-        // ควรมี logic รองรับ เช่นเปลี่ยน target หรือแจ้งเตือน
-        return; 
+        if(permutationforcheck(arr, target)) {
+            shuff.push_back(i);
+        }
     }
 
     random_device rd;
@@ -230,10 +226,12 @@ void newCreateList(int target) {
 }
 
 string newGetfile() {
-    static int count = -1;
-    count++;
-    return combination[shuff[count]];
+    if (currentGameIndex >= shuff.size()) {
+        currentGameIndex = 0; // วนลูปใหม่ถ้าหมด
+    }
+    return combination[shuff[currentGameIndex++]];
 }
+
 
 void clearShuffvector() {
     shuff.clear();
