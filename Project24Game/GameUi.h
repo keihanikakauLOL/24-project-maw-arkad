@@ -274,15 +274,22 @@ void AnswerModule::AddallAnswer(vector<string> setAnswer,string realgo){
 void AnswerModule::DrawAnswers(sf::RenderWindow& window, float offsetY)
 {
     float startY = 200 + offsetY;
-
+    float topLimit = 150;     // ขอบบนของกล่อง
+    float bottomLimit = 580;  // ขอบล่างของกล่อง
     for(int i = 0; i < lines.size(); i++)
     {
-        sf::Text text(font, lines[i], 30);
-        text.setPosition({100, startY + i * 40});
-        text.setFillColor(sf::Color::White);
-        text.setOutlineColor(sf::Color::Black);
-        text.setOutlineThickness(2.f);
-        window.draw(text);
+        float y = startY + i * 40;
+        // draw เฉพาะ text ที่อยู่ในกรอบ
+        if (y > topLimit && y < bottomLimit)
+        {
+            sf::Text text(font, lines[i], 30);
+            text.setPosition({100, y});
+            text.setFillColor(sf::Color::White);
+            text.setOutlineColor(sf::Color::Black);
+            text.setOutlineThickness(2.f);
+
+            window.draw(text);
+        }
     }
 }
 
