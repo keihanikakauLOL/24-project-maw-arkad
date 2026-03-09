@@ -50,16 +50,21 @@ map<string, Player_Data> scoreData;
 void ScoreBoard(const map<string, Player_Data>& data);
 
 int main()
-{    
+{   
     DataLinkedList* myList = loadDataFromFile("scoreboard.txt");
     myList->sortDescending();
-    DataNode* node = myList->getNode(0);
-    scoreData[node->textData] = {node->num1, node->num2};
+    DataNode* node;
+    node = myList->getNode(0);
+    if(node)
+        scoreData[node->textData] = {node->num1, node->num2};
+
     node = myList->getNode(1);
-    scoreData[node->textData] = {node->num1, node->num2};
+    if(node)
+        scoreData[node->textData] = {node->num1, node->num2};
+
     node = myList->getNode(2);
-    scoreData[node->textData] = {node->num1, node->num2};
-    
+    if(node)
+        scoreData[node->textData] = {node->num1, node->num2};
     window.setFramerateLimit(144);
     createQuestions(); 
     srand(time(0));
@@ -913,6 +918,9 @@ void pauseScreen(){ // add steak  // score
         .ColorBox = sf::Color(0,51,102)
     };
     sf::RectangleShape buttonGo = GoNext.builtButton();
+    scoreData[Player_Name].Player_Score = max(scoreData[Player_Name].Player_Score, status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
+    scoreData[Player_Name].Player_Streak = max(scoreData[Player_Name].Player_Streak, status.streak);
+    saveFullScoreToFile("scoreboard.txt", Player_Name, status.score, status.streak);
     while (gameOn == InPause)
     {
         window.clear();

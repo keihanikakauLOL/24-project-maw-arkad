@@ -324,9 +324,9 @@ struct Player_Data{
 void Bar_Chart(sf::RenderWindow& window, const map<string, Player_Data>& data)
 {
     vector<pair<string, Player_Data>> sortedData(data.begin(), data.end());
-    sort(sortedData.begin(), sortedData.end(),[](const auto& a, const auto& b)
-     {
-         return a.second.Player_Score > b.second.Player_Score; // มากไปน้อย
+    sort(sortedData.begin(), sortedData.end(),[](const auto& a, const auto& b) 
+     { 
+         return a.second.Player_Score > b.second.Player_Score; // มากไปน้อย, auto =  pair<string, Player_Data>& a
      });
     int Top_THREE = min(3, (int)sortedData.size());
     if (sortedData.empty())return;
@@ -361,8 +361,12 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, Player_Data>& data)
         float barHeight = point * scale;
 
         // ทำ podium effect (แท่งกลางสูงกว่า)
-        if (dataIndex == 0) barHeight += 40.f;
-        float width = (dataIndex == 0) ? No_1_barWidth : barWidth;
+        bool sameScore = false;
+        if (sortedData.size() >= 2)
+        sameScore = (sortedData[0].second.Player_Score == sortedData[1].second.Player_Score);
+        if (dataIndex == 0 && !sameScore)
+            barHeight += 40.f;
+        float width = (dataIndex == 0 && !sameScore) ? No_1_barWidth : barWidth;
         float posX = (i + 0.5f) * space;
         float posY = baseY - barHeight;
 
@@ -512,7 +516,7 @@ private:
     std::vector<sf::Texture> frames;
     std::optional<sf::Sprite> sprite;
     int currentFrame = 0;
-    float frameTime = 0.1f;
+    float frameTime = 0.1f; // 10 frame ต่อวิ
     sf::Clock clock;
 
 public:
