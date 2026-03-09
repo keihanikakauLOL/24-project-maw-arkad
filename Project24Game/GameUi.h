@@ -324,8 +324,8 @@ struct Player_Data{
 void Bar_Chart(sf::RenderWindow& window, const map<string, Player_Data>& data)
 {
     vector<pair<string, Player_Data>> sortedData(data.begin(), data.end());
-    sort(sortedData.begin(), sortedData.end(),[](const auto& a, const auto& b) 
-     { 
+    sort(sortedData.begin(), sortedData.end(),[](const auto& a, const auto& b)
+     {
          return a.second.Player_Score > b.second.Player_Score; // มากไปน้อย, auto =  pair<string, Player_Data>& a
      });
     int Top_THREE = min(3, (int)sortedData.size());
@@ -513,8 +513,8 @@ void drawBackArrow(sf::RenderWindow& window, sf::Vector2f position, float scale 
 class Animation
 {
 private:
-    std::vector<sf::Texture> frames;
-    std::optional<sf::Sprite> sprite;
+    vector<sf::Texture> frames;
+    optional<sf::Sprite> sprite;
     int currentFrame = 0;
     float frameTime = 0.1f; // 10 frame ต่อวิ
     sf::Clock clock;
