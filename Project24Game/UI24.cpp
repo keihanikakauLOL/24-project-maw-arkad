@@ -2,6 +2,7 @@
 #include "24GameAlgo.h"
 #include "timer_point.h"
 #include "TextSaver.h"
+#include "OmniscientReader.h"
 
 void GameSystem24();
 void Menu();
@@ -50,6 +51,14 @@ void ScoreBoard(const map<string, Player_Data>& data);
 
 int main()
 {    
+    DataLinkedList* myList = loadDataFromFile("scoreboard.txt");
+    myList->sortDescending();
+    DataNode* node = myList->getNode(0);
+    scoreData[node->textData] = {node->num1, node->num2};
+    node = myList->getNode(1);
+    scoreData[node->textData] = {node->num1, node->num2};
+    node = myList->getNode(2);
+    scoreData[node->textData] = {node->num1, node->num2};
     
     window.setFramerateLimit(144);
     createQuestions(); 
@@ -72,7 +81,7 @@ void Menu(){
 
     // button24
     buttonBuild button24 = buttonBuild{
-        .posBox_x = windowSize_x*1/4,
+        .posBox_x = windowSize_x*1/4.f,
         .posBox_y = WindowSize_y/2.f, // 2.5 when no float was assian as double type
         .FontSize = 50,
         .buttonSize_x = 225,
@@ -85,7 +94,7 @@ void Menu(){
 
     // buttonN
     buttonBuild buttonN = buttonBuild{
-        .posBox_x = windowSize_x*3/4,
+        .posBox_x = windowSize_x*3/4.f,
         .posBox_y = WindowSize_y/(2.f), // 2.5 when dno float was assian as double type
         .FontSize = 50,
         .buttonSize_x = 225,
@@ -98,7 +107,7 @@ void Menu(){
 
     // buttonN
     buttonBuild buttonScore = buttonBuild{
-        .posBox_x = windowSize_x*0.5f,
+        .posBox_x = windowSize_x*1/4.f,
         .posBox_y = WindowSize_y*0.75f, // 2.5 when no float was assian as double type
         .FontSize = 50,
         .buttonSize_x = 150,
@@ -110,7 +119,7 @@ void Menu(){
     };
 
     buttonBuild Answer = buttonBuild{
-        .posBox_x = windowSize_x*0.75f,
+        .posBox_x = windowSize_x*3/4.f,
         .posBox_y = WindowSize_y*0.75f, // 2.5 when no float was assian as double type
         .FontSize = 40,
         .buttonSize_x = 150,
@@ -201,7 +210,7 @@ void AnswerSheet(string setNum , string goal){
     AnswerBox.AddallAnswer(solutions,goal);
     buttonBuild GoNext = buttonBuild{
         .posBox_x = windowSize_x*5/10,
-        .posBox_y = WindowSize_y*8/10, // 2.5 when no float was assian as double type
+        .posBox_y = WindowSize_y*85/100, // 2.5 when no float was assian as double type
         .FontSize = 50,
         .buttonSize_x = 225,
         .buttonSize_y = 100,
@@ -229,8 +238,8 @@ void AnswerSheet(string setNum , string goal){
             if (event->is<sf::Event::Closed>()){stat.quit();window.close();}
             if(const auto* wheel = event->getIf<sf::Event::MouseWheelScrolled>()){// test scrolling
                         scrollOffset += wheel->delta*40;
-                        float maxScroll = 300;
-                        float minScroll = -(AnswerBox.getLineCount() * 40 - 600);
+                        float maxScroll = 200;
+                        float minScroll = -(AnswerBox.getLineCount() * 40 - 100);
                         if(minScroll > 0) minScroll = 0;
                         if(scrollOffset > maxScroll)
                             scrollOffset = maxScroll;
@@ -315,14 +324,8 @@ void GameSystem24(){
     gameOn = InEnterName;
     Player_Name = EnterName();
     stat.resettimer();
-    if(scoreData.count(Player_Name) > 0){
-        Player_Data &p = scoreData[Player_Name];
-        stat.loadPlayerData(p.Player_Score, p.Player_Streak);  // เล่นต่อ
-    }
-    else{
-        scoreData[Player_Name] = {0,0};
-        stat.loadPlayerData(0,0); // ผู้เล่นใหม่
-    }
+    scoreData[Player_Name] = {0,0};
+    stat.loadPlayerData(0,0); // ผู้เล่นใหม่
     int type_games = 24;
     string goalstr = "24";
     double goal = (double)type_games;
@@ -431,14 +434,9 @@ void GameOver(){
 void GameRandom(){
     gameOn = InEnterName;
     Player_Name = EnterName();
-    if(scoreData.count(Player_Name) > 0){
-    Player_Data &p = scoreData[Player_Name];
-        stat.loadPlayerData(p.Player_Score, p.Player_Streak);
-    }
-    else{
-        scoreData[Player_Name] = {0,0};
-        stat.loadPlayerData(0,0);
-    }
+    stat.resettimer();
+    scoreData[Player_Name] = {0,0};
+    stat.loadPlayerData(0,0); // ผู้เล่นใหม่
     while (state == RANDOM_MODE){
         int type_games = rand()%90+10;
         string goalstr = to_string(type_games);
@@ -792,11 +790,12 @@ void Round(string setNumberString,double goal,string goalstr){ // time
                 if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){ 
                     if (mouseButtonPressed->button == sf::Mouse::Button::Left){
                         window.clear();
-                        status = stat.ChooseYourChoice();
-                        scoreData[Player_Name].Player_Score = max(scoreData[Player_Name].Player_Score, status.score);
+                        scoreData[Player_Name].Player_Score = max(scoreData[Player_Name].Player_Score, status.score); // ยัดลง map โดยถ้าคะแนนเก่ามากกว่าไม่อัพเดต ถ้าใหม่มากกว่าอัพเดต เหลือบันทึกลงไฟล์นอก
                         scoreData[Player_Name].Player_Streak = max(scoreData[Player_Name].Player_Streak, status.streak);
                         saveFullScoreToFile("scoreboard.txt", Player_Name, status.score, status.streak);
-
+                        stat.loadPlayerData(0,0);   // reset score และ streak
+                        status.score = 0;
+                        status.streak = 0;
                         state = MENU;
                         gameOn = NotInGame;
                     }
@@ -889,9 +888,6 @@ void pauseScreen(){ // add steak  // score
         .ColorBox = sf::Color(0,51,102)
     };
     sf::RectangleShape buttonGo = GoNext.builtButton();
-    scoreData[Player_Name].Player_Score = max(scoreData[Player_Name].Player_Score, status.score);
-    scoreData[Player_Name].Player_Streak = max(scoreData[Player_Name].Player_Streak, status.streak);
-    saveFullScoreToFile("scoreboard.txt", Player_Name, status.score, status.streak);
     while (gameOn == InPause)
     {
         window.clear();
