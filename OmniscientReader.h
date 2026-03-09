@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <utility>
 
 class DataNode {
 public:
@@ -41,6 +42,44 @@ public:
         }
     }
 
+    void sortDescending() {
+        if (head == nullptr || head->next == nullptr) return;
+
+        bool swapped;
+        DataNode* ptr1;
+        DataNode* lptr = nullptr;
+
+        do {
+            swapped = false;
+            ptr1 = head;
+
+            while (ptr1->next != lptr) {
+                if (ptr1->num1 < ptr1->next->num1) { 
+                    std::swap(ptr1->textData, ptr1->next->textData);
+                    std::swap(ptr1->num1, ptr1->next->num1);
+                    std::swap(ptr1->num2, ptr1->next->num2);
+                    swapped = true;
+                }
+                ptr1 = ptr1->next;
+            }
+            lptr = ptr1;
+        } while (swapped);
+    }
+
+    DataNode* getNode(int index) {
+        DataNode* current = head;
+        int count = 0;
+        
+        while (current != nullptr) {
+            if (count == index) {
+                return current;
+            }
+            count++;
+            current = current->next;
+        }
+        return nullptr;
+    }
+
     ~DataLinkedList() {
         DataNode* current = head;
         while (current != nullptr) {
@@ -56,7 +95,6 @@ inline DataLinkedList* loadDataFromFile(const std::string& filename = "data.txt"
     std::ifstream file(filename);
 
     if (!file.is_open()) {
-        std::cerr << "Error: ไม่สามารถเปิดไฟล์ " << filename << " ได้\n";
         return list;
     }
 
