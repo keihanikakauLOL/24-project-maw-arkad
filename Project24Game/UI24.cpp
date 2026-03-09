@@ -8,6 +8,7 @@ void Menu();
 void GameOver();
 void Round(string,double,string);
 void GameRandom();
+void AnswerMode();
 void AnswerSheet(string,string);
 void pauseScreen();
 string EnterName();
@@ -25,7 +26,8 @@ enum GameState { // state of game to process more easily
     MENU,
     GAME24,
     RANDOM_MODE,
-    SCORE_BOARD
+    SCORE_BOARD,
+    AnswerState
 };
 
 
@@ -55,13 +57,10 @@ int main()
     while (window.isOpen())
     {
         if (state == MENU){Menu();}
-        if (state == GAME24){usleep(80000);GameSystem24();}
-        if (state == RANDOM_MODE){usleep(80000);GameRandom();}
-        if (state == SCORE_BOARD){
-            
-            usleep(80000);
-            ScoreBoard(scoreData);
-        }
+        if (state == GAME24){GameSystem24();}
+        if (state == RANDOM_MODE){GameRandom();}
+        if (state == SCORE_BOARD){ScoreBoard(scoreData);}
+        if (state == AnswerState){AnswerMode();}
     }
     
 }
@@ -109,10 +108,23 @@ void Menu(){
         .name = "Score",
         .ColorBox = sf::Color(0,51,102)
     };
+
+    buttonBuild Answer = buttonBuild{
+        .posBox_x = windowSize_x*0.75f,
+        .posBox_y = WindowSize_y*0.75f, // 2.5 when no float was assian as double type
+        .FontSize = 40,
+        .buttonSize_x = 150,
+        .buttonSize_y = 75,
+        .X = 5,
+        .Y = 0,
+        .name = "Answer",
+        .ColorBox = sf::Color(0,51,102)
+    };
     
     sf:: RectangleShape button_24 = button24.builtButton();
     sf:: RectangleShape button_N = buttonN.builtButton();
     sf:: RectangleShape button_Score = buttonScore.builtButton();
+    sf:: RectangleShape buttonAnswer = Answer.builtButton();
     
     
     // GameOn
@@ -153,15 +165,26 @@ void Menu(){
             }else{
                 button_Score.setFillColor(buttonScore.ColorBox); // reset went not set
             }
+            if (buttonAnswer.getGlobalBounds().contains(mouse_pos)) // check button is coline with mouse : augmentNeedtoCheck.getGlobalBound().contains(whatIscheckwith); >> getGlobalBound() = check coline
+            {
+                buttonAnswer.setFillColor(sf::Color(0,75,22)); // we can create animated or click to process
+                if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){state = AnswerState;}
+                }
+            }else{
+                buttonAnswer.setFillColor(buttonN.ColorBox); // reset went not set
+            }
         }
             // windown.draw is order by line to line upper = under
             window.draw(tilte.TitleName());
             window.draw(button_24);
             window.draw(button_N);
             window.draw(button_Score);
+            window.draw(buttonAnswer);
             window.draw(button24.txtBox(button24.builtButton().getGeometricCenter()));
             window.draw(buttonN.txtBox(buttonN.builtButton().getGeometricCenter())); 
             window.draw(buttonScore.txtBox(buttonScore.builtButton().getGeometricCenter()));
+            window.draw(Answer.txtBox(buttonAnswer.getGeometricCenter()));
             window.display(); 
     }      
     
@@ -232,6 +255,60 @@ void AnswerSheet(string setNum , string goal){
     }
 }
 
+void AnswerMode(){
+    BoxName Number;
+    buttonBuild Cal = {
+        .posBox_x = windowSize_x*50/100,
+        .posBox_y = WindowSize_y*65/100, // 2.5 when no float was assian as double type
+        .FontSize = 60,
+        .buttonSize_x = 300,
+        .buttonSize_y = 150,
+        .X = 0,
+        .Y = 0,
+        .name = "Calculate",
+        .ColorBox = sf::Color(255,20,52)
+        };
+    sf::RectangleShape CalButton = Cal.builtButton();
+    while (state == AnswerState){
+        window.clear();
+        auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(window));
+        if(auto event = window.pollEvent()){
+            if (event->is<sf::Event::Closed>()) window.close();
+            if (CalButton.getGlobalBounds().contains(mouse_pos)) 
+            {
+                CalButton.setFillColor(sf::Color(44,75,22)); 
+                if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left && Number.name.size() == 7){
+                        gameOn = AnswerSheetmode;
+                        AnswerSheet(Number.name.substr(0,4),Number.name.substr(5,2));
+                    }
+                }
+            }else{
+                CalButton.setFillColor(Cal.ColorBox);
+            }
+            if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
+            {
+                if (textEntered->unicode > 47 && textEntered->unicode < 58 && textEntered->unicode != 8 && textEntered->unicode != 13 && textEntered->unicode != 32){
+                    Number.name += static_cast<char>(textEntered->unicode);
+                }else if (textEntered->unicode == 8){
+                    if (Number.name.size() > 0) {Number.Backspace();}
+                }else if (textEntered->unicode == 13 && Number.name.size() == 7){
+                    gameOn = AnswerSheetmode;
+                    AnswerSheet(Number.name.substr(0,4),Number.name.substr(5,2));
+                }else if (textEntered->unicode == 32){
+                    Number.name += " ";
+                }
+            }
+            
+        }
+        GradiantBackground_Game24(window);
+        EnterName_Text(window,"- - ENTER YOUR NUM - -");
+        window.draw(CalButton);
+        window.draw(Cal.txtBox(CalButton.getGeometricCenter()));
+        window.draw(Number.NameShow());
+        window.display();
+    }
+}
 
 
 void GameSystem24(){
@@ -246,7 +323,6 @@ void GameSystem24(){
         scoreData[Player_Name] = {0,0};
         stat.loadPlayerData(0,0); // ผู้เล่นใหม่
     }
-    usleep(80000);
     int type_games = 24;
     string goalstr = "24";
     double goal = (double)type_games;
@@ -258,7 +334,6 @@ void GameSystem24(){
         Round(setNumber,goal,goalstr);
         status = stat.ChooseYourChoice();
         stat.pauseTimer();
-        usleep(11000);
         pauseScreen();
         stat.resettimer();
     }
@@ -287,18 +362,25 @@ string EnterName(){
             {
                 EnterNameButton.setFillColor(sf::Color(44,75,22)); 
                 if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
-                    if (mouseButtonPressed->button == sf::Mouse::Button::Left){gameOn = NotInGame;}
+                    if (mouseButtonPressed->button == sf::Mouse::Button::Left && Player.name.size() > 0){gameOn = NotInGame;}
                 }
             }else{
                 EnterNameButton.setFillColor(EnterName.ColorBox);
             }
-            if (auto* keyPressed = event ->getIf<sf::Event::KeyPressed>()){
-                string Alpahbet = sf::Keyboard::getDescription(keyPressed->scancode).toAnsiString();
-                Player.name += Alpahbet;
+            if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
+            {
+                if (textEntered->unicode < 128 && textEntered->unicode != 8 && textEntered->unicode != 13){
+                    Player.name += static_cast<char>(textEntered->unicode);
+                }else if (textEntered->unicode == 8){
+                    if (Player.name.size() > 0) {Player.Backspace();}
+                }else if (textEntered->unicode == 13 && Player.name.size() > 0){
+                    gameOn = NotInGame;
+                }
             }
+
         }
         GradiantBackground_Game24(window);
-        EnterName_Text(window);
+        EnterName_Text(window,"- - ENTER YOUR NAME - -");
         window.draw(EnterNameButton);
         window.draw(EnterName.txtBox(EnterNameButton.getGeometricCenter()));
         window.draw(Player.NameShow());
@@ -357,7 +439,6 @@ void GameRandom(){
         scoreData[Player_Name] = {0,0};
         stat.loadPlayerData(0,0);
     }
-    usleep(80000);
     while (state == RANDOM_MODE){
         int type_games = rand()%90+10;
         string goalstr = to_string(type_games);
@@ -370,7 +451,6 @@ void GameRandom(){
         Round(setNumber,goal,goalstr);
         status = stat.ChooseYourChoice();
         stat.pauseTimer(); 
-        usleep(11000);
         pauseScreen();
         stat.resettimer();
     }
@@ -736,7 +816,6 @@ void Round(string setNumberString,double goal,string goalstr){ // time
                 if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
                     if (mouseButtonPressed->button == sf::Mouse::Button::Left && Display.Order.size() > 0 && Display.NumAllowed == 1){
                         Display.NumAllowed = 0;
-                        usleep(80000);
                     }
                 }
             }
@@ -783,7 +862,6 @@ void Round(string setNumberString,double goal,string goalstr){ // time
             setNumber[Display.indexMustChage] = Display.newData;
             setNumberStr[Display.indexMustChage] = Display.newDataStr;
             gateway[Display.indexMustChage] = 0;
-            usleep(80000);
             Display.OrderClear();
             Display.NumAllowed = 1;
         }
@@ -834,7 +912,6 @@ void pauseScreen(){ // add steak  // score
                 buttonGo.setFillColor(sf::Color(0,75,22));
                 if(const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
                     if (mouseButtonPressed->button == sf::Mouse::Button::Left){
-                        usleep(80000);
                         gameOn = InRound;
                     }
                 }

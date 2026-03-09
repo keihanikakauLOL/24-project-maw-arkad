@@ -100,7 +100,12 @@ class BoxName{
     public:
         string name = "";
         sf::Text NameShow();
+        void Backspace();
 };
+
+void BoxName::Backspace(){
+    name.pop_back();
+}
 
 sf::Text BoxName::NameShow(){
     sf::Text Text(font,name,60); 
@@ -260,7 +265,7 @@ void AnswerModule::AddallAnswer(vector<string> setAnswer,string realgo){
                 lines.push_back(line);
                 line = "";
             }
-            else {line += " , ";}
+            else {line += "  ";}
     }
     if(line != "")
         lines.push_back(line);
@@ -647,8 +652,8 @@ void GameOver_Text(sf::RenderWindow& window){
     window.draw(gameOverText);
 }
 
-void EnterName_Text(sf::RenderWindow& window){
-    sf::Text EnterName(font, "- - ENTER YOUR NAME - -");
+void EnterName_Text(sf::RenderWindow& window, string s){
+    sf::Text EnterName(font,s);
     EnterName.setCharacterSize(50);
     EnterName.setFillColor(sf::Color::White);
     EnterName.setOutlineColor(sf::Color::Black);
