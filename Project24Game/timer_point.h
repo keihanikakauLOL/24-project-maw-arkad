@@ -45,44 +45,44 @@ public:
         }
     }
     
-    void displayAll() {
-        std::cout << "\n========== SCOREBOARD ==========" << std::endl;
-        std::cout << std::left << std::setw(15) << "Name" 
-                  << std::setw(12) << "Best Time" 
-                  << std::setw(15) << "High Score" 
-                  << std::setw(15) << "High Streak" << std::endl;
-        std::cout << "======================================" << std::endl;
-        
-        for (auto& pair : players) {
-            User& p = pair.second;
-            std::cout << std::left << std::setw(15) << p.name 
-                      << std::setw(12) << std::fixed << std::setprecision(2) << p.bestTime 
-                      << std::setw(15) << p.highestScore 
-                      << std::setw(15) << p.highestStreak << std::endl;
-        }
-        std::cout << "======================================\n" << std::endl;
-    }
+    //void displayAll() {
+    //    std::cout << "\n========== SCOREBOARD ==========" << std::endl;
+    //    std::cout << std::left << std::setw(15) << "Name" 
+    //              << std::setw(12) << "Best Time" 
+    //              << std::setw(15) << "High Score" 
+    //              << std::setw(15) << "High Streak" << std::endl;
+    //    std::cout << "======================================" << std::endl;
+    //    
+    //    for (auto& pair : players) {
+    //        User& p = pair.second;
+    //        std::cout << std::left << std::setw(15) << p.name 
+    //                  << std::setw(12) << std::fixed << std::setprecision(2) << p.bestTime 
+    //                  << std::setw(15) << p.highestScore 
+    //                  << std::setw(15) << p.highestStreak << std::endl;
+    //    }
+    //    std::cout << "======================================\n" << std::endl;
+    //}
     
-    void displayScores(int n = 5) {
-        std::cout << "\n===== TOP " << n << " HIGH SCORES =====" << std::endl;
+    //void displayScores(int n = 5) {
+    //    std::cout << "\n===== TOP " << n << " HIGH SCORES =====" << std::endl;
         
-        std::vector<User> sortedPlayers;
-        for (auto& pair : players) {
-            sortedPlayers.push_back(pair.second);
-        }
+    //    std::vector<User> sortedPlayers;
+    //    for (auto& pair : players) {
+    //        sortedPlayers.push_back(pair.second);
+    //    }
         
-        std::sort(sortedPlayers.begin(), sortedPlayers.end(), 
-                  [](const User& a, const User& b) {
-                      return a.highestScore > b.highestScore;
-                  });
+    //    std::sort(sortedPlayers.begin(), sortedPlayers.end(), 
+    //              [](const User& a, const User& b) {
+    //                  return a.highestScore > b.highestScore;
+    //              });
         
-        int count = std::min(n, (int)sortedPlayers.size());
-        for (int i = 0; i < count; i++) {
-            std::cout << i+1 << ". " << sortedPlayers[i].name 
-                      << " - " << sortedPlayers[i].highestScore << " pts" << std::endl;
-        }
-        std::cout << "============================\n" << std::endl;
-    }
+    //    int count = std::min(n, (int)sortedPlayers.size());
+    //    for (int i = 0; i < count; i++) {
+    //        std::cout << i+1 << ". " << sortedPlayers[i].name 
+    //                  << " - " << sortedPlayers[i].highestScore << " pts" << std::endl;
+    //    }
+    //    std::cout << "============================\n" << std::endl;
+    //}
     
     User* getPlayer(std::string name) {
         if (players.find(name) != players.end()) {
@@ -103,12 +103,7 @@ public:
         int streak;
         int timeLeft;
     };
-    void loadPlayerData(int scoreVal, int streakVal) {
-    score = scoreVal;
-    streak = streakVal;
-    scoremax = scoreVal;
-    streakmax = streakVal;
-    }
+    
     void updateStreakAndScore(bool isCorrect) {
         if (!running) return;
 
@@ -119,23 +114,23 @@ public:
                     streakmax.store(streak.load());
                 }
                 received_score = base_score + (base_score * (streak / 4));
-                std::cout << "\nCorrect! Streak: " << streak << std::endl;
-                std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
+                //std::cout << "\nCorrect! Streak: " << streak << std::endl;
+                //std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
             } else {
                 received_score = base_score;
-                std::cout << "\nCorrect!" << std::endl;
-                std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
+                //std::cout << "\nCorrect!" << std::endl;
+                //std::cout << "Score: +" << received_score << " | Total: " << score + received_score << std::endl;
             }
             
             score += received_score;
             if (score.load() > scoremax.load()) {
                 scoremax.store(score.load());
             }
-            //
+            
         } else {
             streak = 0;
-            std::cout << "\nWrong! Streak reset." << std::endl;
-            std::cout << "Total score: " << score << std::endl;
+            //std::cout << "\nWrong! Streak reset." << std::endl;
+            //std::cout << "Total score: " << score << std::endl;
         }
     }
 
@@ -165,6 +160,7 @@ private:
                 std::cout << "\r[Time Left: " << timeLeft << "s] " << std::flush;
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 timeLeft--;
+
                 if (timeLeft <= 0) {
                     timeLeft = 0;
                     timerout();
@@ -181,6 +177,8 @@ private:
                 std::cout << "\n\n--- TIME'S UP! ---";
                 std::cout << "\nFinal Score: " << score << "\n";
                 timeout = false;
+                streak = 0;
+                score = 0; // thiw เพิ่มเอง score มันไม่รีเซ็ตตอนหมดเวลา
             }
 
             if (restartFlag) {
