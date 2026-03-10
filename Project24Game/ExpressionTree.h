@@ -76,13 +76,8 @@ Node* buildTree(string exp) {
     for (int i = 0; i < exp.length(); i++) {
         //number
         if (isdigit(exp[i])) {
-            string val = "";
-            while (i < exp.length() && isdigit(exp[i])) {
-                val += exp[i++];
-            }
-            nodes.push(new Node(val));
-            i--; 
-        } 
+            nodes.push(new Node(string(1, exp[i])));
+        }
         else if (exp[i] == '(') {
             //starting point
             ops.push('(');
