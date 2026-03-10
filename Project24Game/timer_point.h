@@ -162,7 +162,6 @@ private:
     void timer() {
         while (runaway) {
             if (running && !paused && timeLeft > 0) {
-                std::cout << "\r[Time Left: " << timeLeft << "s] " << std::flush;
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                 timeLeft--;
 
@@ -183,7 +182,7 @@ private:
                 std::cout << "\nFinal Score: " << score << "\n";
                 timeout = false;
                 streak = 0;
-                score = 0; // thiw เพิ่มเอง score มันไม่รีเซ็ตตอนหมดเวลา
+                score = 0;
             }
 
             if (restartFlag) {
@@ -200,7 +199,6 @@ private:
         streak = 0;
         paused = false;
         running = true;
-        std::cout << "\n--- Game Restarted! ---\n";
     }
 
 public:
@@ -257,14 +255,12 @@ public:
     void pauseTimer() {
         if (!paused && running) {
             paused = true;
-            std::cout << "\n[Game Paused]\n";
         }
     }
 
     void resumeTimer() {
         if (paused && running) {
             paused = false;
-            std::cout << "\n[Game Resumed]\n";
         }
     }
 
