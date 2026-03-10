@@ -103,7 +103,12 @@ public:
         int streak;
         int timeLeft;
     };
-    
+    void loadPlayerData(int scoreVal, int streakVal) {
+    score = scoreVal;
+    streak = streakVal;
+    scoremax = scoreVal;
+    streakmax = streakVal;
+    }
     void updateStreakAndScore(bool isCorrect) {
         if (!running) return;
 
