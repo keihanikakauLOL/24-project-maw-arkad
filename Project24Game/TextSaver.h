@@ -51,7 +51,6 @@ void saveFullScoreToFile(const string& filename, const string& name, int score, 
     }
 
     outFile.close();
-    cout << "Score saved: " << name << " " << score << " " << streak << endl;
 }
 
 #endif

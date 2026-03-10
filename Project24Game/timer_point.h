@@ -133,8 +133,6 @@ private:
     void endGame() {
         while (runaway) {
             if (running && timeout) {
-                std::cout << "\n\n--- TIME'S UP! ---";
-                std::cout << "\nFinal Score: " << score << "\n";
                 timeout = false;
                 streak = 0;
                 score = 0;
