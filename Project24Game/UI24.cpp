@@ -305,7 +305,7 @@ void AnswerMode(){
             }
             if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
             {
-                if (textEntered->unicode > 47 && textEntered->unicode < 58 && textEntered->unicode != 8 && textEntered->unicode != 13 && textEntered->unicode != 32){
+                if (textEntered->unicode > 47 && textEntered->unicode < 58){
                     Number.name += static_cast<char>(textEntered->unicode);
                 }else if (textEntered->unicode == 8){
                     if (Number.name.size() > 0) {Number.Backspace();}
@@ -393,7 +393,7 @@ string EnterName(){
             }
             if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
             {
-                if (textEntered->unicode < 128 && textEntered->unicode != 8 && textEntered->unicode != 13){
+                if (Player.name.size() < 15 && textEntered->unicode < 128 && textEntered->unicode != 8 && textEntered->unicode != 13 && textEntered->unicode != 32){
                     Player.name += static_cast<char>(textEntered->unicode);
                 }else if (textEntered->unicode == 8){
                     if (Player.name.size() > 0) {Player.Backspace();}
@@ -985,5 +985,6 @@ void ScoreBoard(const map<string, Player_Data>& data){
                 }
             }
             window.display();
-        }           
+        }
+             
 }
