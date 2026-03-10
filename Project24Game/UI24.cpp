@@ -532,7 +532,7 @@ void Round(string setNumberString,double goal,string goalstr){
     buttonBuild AnsPop = {
             .posBox_x = windowSize_x*90/100,
             .posBox_y = WindowSize_y*60/100,
-            .FontSize = 50,
+            .FontSize = 25,
             .buttonSize_x = 50,
             .buttonSize_y = 50,
             .X = 0,

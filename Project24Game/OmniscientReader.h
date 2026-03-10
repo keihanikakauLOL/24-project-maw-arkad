@@ -1,5 +1,5 @@
-#ifndef DATA_READER_H
-#define DATA_READER_H
+#ifndef OMNISCIENTREADER_H
+#define OMNISCIENTREADER_H
 
 #include <iostream>
 #include <fstream>

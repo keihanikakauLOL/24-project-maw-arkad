@@ -1,5 +1,5 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef TIMER_POINT_H
+#define TIMER_POINT_H
 
 #include <iostream>
 #include <thread>
