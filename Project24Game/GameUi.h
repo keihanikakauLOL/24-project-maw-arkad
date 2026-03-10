@@ -12,7 +12,7 @@ using namespace std;
 string Fontloc = "C:/Windows/Fonts/arial.ttf";
 float windowSize_x = 800;
 float WindowSize_y = 800;
-sf::Font font(Fontloc); //import font_style variable (pull form location)  
+sf::Font font(Fontloc);
 
 class buttonBuild{
     public:
@@ -50,7 +50,7 @@ sf::Text Title::TitleName(){
 
 
 sf::RectangleShape buttonBuild::builtButton(){
-    sf::RectangleShape button({buttonSize_x,buttonSize_y}); //Create button variable with size
+    sf::RectangleShape button({buttonSize_x,buttonSize_y});
     button.setPosition({posBox_x,posBox_y}); 
     button.setOrigin(button.getGeometricCenter());
     button.setFillColor(ColorBox);
@@ -69,7 +69,6 @@ sf::Text buttonBuild::txtBox(sf::Vector2f buttonCenter){
 }
 
 
-/// ////////////////////////////////
 class Pause{
     string word;
     int FontSize;
@@ -225,7 +224,7 @@ sf::Text Screen::printData(int time){
 }
 
 sf::RectangleShape Screen::BoxScreen(){
-    sf::RectangleShape Box({windowSize_x*80/100,WindowSize_y*20/100}); //Create button variable with size
+    sf::RectangleShape Box({windowSize_x*80/100,WindowSize_y*20/100});
     Box.setPosition({windowSize_x/2,150}); 
     Box.setOrigin(Box.getGeometricCenter());
     Box.setFillColor(sf::Color(128,128,128));
@@ -260,7 +259,6 @@ void AnswerModule::AddallAnswer(vector<string> setAnswer,string realgo){
     string line;
     for (unsigned int  i = 1; i < setAnswer.size(); i ++){
             line += setAnswer[i];
-            //allAnswer += setAnswer[i];
             if (i % 3 == 0){
                 lines.push_back(line);
                 line = "";
@@ -274,12 +272,11 @@ void AnswerModule::AddallAnswer(vector<string> setAnswer,string realgo){
 void AnswerModule::DrawAnswers(sf::RenderWindow& window, float offsetY)
 {
     float startY = 200 + offsetY;
-    float topLimit = 150;     // ขอบบนของกล่อง
-    float bottomLimit = 580;  // ขอบล่างของกล่อง
+    float topLimit = 150;
+    float bottomLimit = 580;
     for(int i = 0; i < lines.size(); i++)
     {
         float y = startY + i * 40;
-        // draw เฉพาะ text ที่อยู่ในกรอบ
         if (y > topLimit && y < bottomLimit)
         {
             sf::Text text(font, lines[i], 30);
@@ -287,21 +284,11 @@ void AnswerModule::DrawAnswers(sf::RenderWindow& window, float offsetY)
             text.setFillColor(sf::Color::White);
             text.setOutlineColor(sf::Color::Black);
             text.setOutlineThickness(2.f);
-
             window.draw(text);
         }
     }
 }
 
-/*sf::Text  AnswerModule::CreateAnsBox(){
-    sf::Text Ans(font,allAnswer,30);
-    sf::FloatRect boundScreen = Ans.getLocalBounds();
-    Ans.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
-    Ans.setPosition({windowSize_x*40/100,200});
-    Ans.setOutlineColor(sf::Color::Black);
-    Ans.setOutlineThickness(2.f);
-    return Ans;
-}*/
 
 sf::Text  AnswerModule::CreateAnsBoxTopic(){
     string RealText;
@@ -326,25 +313,21 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, Player_Data>& data)
     vector<pair<string, Player_Data>> sortedData(data.begin(), data.end());
     sort(sortedData.begin(), sortedData.end(),[](const auto& a, const auto& b)
      {
-         return a.second.Player_Score > b.second.Player_Score; // มากไปน้อย, auto =  pair<string, Player_Data>& a
+         return a.second.Player_Score > b.second.Player_Score;
      });
     int Top_THREE = min(3, (int)sortedData.size());
     if (sortedData.empty())return;
 
     int data_max = sortedData[0].second.Player_Score;
-    // size of window
-        float window_w = static_cast<float>(window.getSize().x);
-        float window_h = static_cast<float>(window.getSize().y);
-    //parameter
-        float baseY = 750.f;              // ยกฐานขึ้นจากขอบล่าง
-        float space = window_w / 3.f;     // แบ่ง 3 ช่อง
-        float barWidth = 160.f;
-        float scale = (data_max > 0) ? 320.f / data_max : 1.f;   // scale พอดีจอ
-        float No_1_barWidth = 200.f; // แท่งที่ 1 ใหญ่กว่า
+    float window_w = static_cast<float>(window.getSize().x);
+    float window_h = static_cast<float>(window.getSize().y);
+    float baseY = 750.f;
+    float space = window_w / 3.f;
+    float barWidth = 160.f;
+    float scale = (data_max > 0) ? 320.f / data_max : 1.f;
+    float No_1_barWidth = 200.f;
 
-
-    // podium
-    vector<int> podiumOrder; // (2,1,3)
+    vector<int> podiumOrder;
     if (sortedData.size() == 1)
         podiumOrder = {0};
     else if (sortedData.size() == 2)
@@ -360,7 +343,6 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, Player_Data>& data)
         int point = pData.Player_Score;
         float barHeight = point * scale;
 
-        // ทำ podium effect (แท่งกลางสูงกว่า)
         bool sameScore = false;
         if (sortedData.size() >= 2)
         sameScore = (sortedData[0].second.Player_Score == sortedData[1].second.Player_Score);
@@ -370,7 +352,6 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, Player_Data>& data)
         float posX = (i + 0.5f) * space;
         float posY = baseY - barHeight;
 
-        // BAR
         sf::RectangleShape bar({width, barHeight});
         bar.setOrigin({width/2.f, 0.f});
         bar.setPosition({posX, baseY});
@@ -381,45 +362,36 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, Player_Data>& data)
             bar.setFillColor(sf::Color(0,76,153));
         window.draw(bar);
 
-       
-        // SCORE (กลางแท่ง)
         sf::Text scoreText(font, to_string(point));
         scoreText.setCharacterSize(24);
         scoreText.setFillColor(sf::Color::White);
         scoreText.setOutlineColor(sf::Color::Black);
         scoreText.setOutlineThickness(2.f);
-
         sf::FloatRect scoreBounds = scoreText.getLocalBounds();
         scoreText.setOrigin({scoreBounds.position.x + scoreBounds.size.x / 2.f,scoreBounds.position.y + scoreBounds.size.y / 2.f});
         scoreText.setPosition({posX, baseY - barHeight/2.f});
         window.draw(scoreText);
 
-        
-        // NAME (บนแท่ง)
         sf::Text nameText(font, name);
         nameText.setCharacterSize(26);
         nameText.setFillColor(sf::Color::White);
         nameText.setOutlineColor(sf::Color::Black);
         nameText.setOutlineThickness(2.f);
-
         sf::FloatRect nameBounds = nameText.getLocalBounds();
         nameText.setOrigin({nameBounds.position.x + nameBounds.size.x / 2.f,nameBounds.position.y + nameBounds.size.y / 2.f});
         nameText.setPosition({posX, posY - 50.f});
         window.draw(nameText);
 
-        // STREAK 6️⃣7️⃣
-        sf::Text streakText(font, "streak : " + to_string(pData.Player_Streak)); // รอใส่ getMaxStreak() 🤡🤡🤡🤡
+        sf::Text streakText(font, "streak : " + to_string(pData.Player_Streak));
         streakText.setCharacterSize(26);
         streakText.setFillColor(sf::Color::White);
         streakText.setOutlineColor(sf::Color::Black);
         streakText.setOutlineThickness(2.f);
-
         sf::FloatRect streakBounds = streakText.getLocalBounds();
         streakText.setOrigin({streakBounds.position.x + streakBounds.size.x / 2.f,streakBounds.position.y + streakBounds.size.y / 2.f});
         streakText.setPosition({posX, posY - 20.f});
         window.draw(streakText);
 
-        // RANK CIRCLE
         sf::CircleShape circle(28.f);
         circle.setOrigin({28.f, 28.f});
         circle.setPosition({posX, posY - 100.f});
@@ -436,7 +408,6 @@ void Bar_Chart(sf::RenderWindow& window, const map<string, Player_Data>& data)
         rankText.setFillColor(sf::Color::White);
         rankText.setOutlineColor(sf::Color::Black);
         rankText.setOutlineThickness(2.f);
-
         sf::FloatRect rankBounds = rankText.getLocalBounds();
         rankText.setOrigin({rankBounds.position.x + rankBounds.size.x / 2.f,rankBounds.position.y + rankBounds.size.y / 2.f});
         rankText.setPosition(circle.getPosition());
@@ -482,7 +453,6 @@ void drawBackArrow(sf::RenderWindow& window, sf::Vector2f position, float scale 
     float headLength = 15.f;
     float headHeight = 20.f;
 
-    // Body (Rectangle) 
     sf::RectangleShape body;
     body.setSize({bodyLength, bodyHeight});
     body.setFillColor(color);
@@ -491,7 +461,6 @@ void drawBackArrow(sf::RenderWindow& window, sf::Vector2f position, float scale 
     body.setOutlineColor(sf::Color::Black);
     body.setOutlineThickness(2.f);
 
-    // Head (Triangle)
     sf::ConvexShape head;
     head.setPointCount(3);
     head.setPoint(0, {-headLength,                  0});         
@@ -503,7 +472,6 @@ void drawBackArrow(sf::RenderWindow& window, sf::Vector2f position, float scale 
     head.setOutlineColor(sf::Color::Black);
     head.setOutlineThickness(2.f);
 
-    // scale ทั้ง body และ head
     body.setScale({scale, scale});
     head.setScale({scale, scale});
     window.draw(body);
@@ -521,24 +489,22 @@ private:
 
 public:
     Animation() {}
-    Animation(const std::string& folder,
-              const std::string& baseName,
-              const std::string& extension,
+    Animation(const string& folder,
+              const string& baseName,
+              const string& extension,
               int totalFrames)
     {
         load(folder, baseName, extension, totalFrames);
     }
 
-    bool load(const std::string& folder,
-              const std::string& baseName,
-              const std::string& extension,
+    bool load(const string& folder,
+              const string& baseName,
+              const string& extension,
               int totalFrames)
     {
         for (int i = 0; i < totalFrames; i++){
             sf::Texture texture;
-            std::string path =
-                folder + "/" + baseName +
-                std::to_string(i) + "." + extension;
+            string path = folder + "/" + baseName + to_string(i) + "." + extension;
             if (!texture.loadFromFile(path))
                 return false;
             frames.push_back(texture);
@@ -556,7 +522,6 @@ public:
             currentFrame++;
             if (currentFrame >= frames.size())
                 currentFrame = 0;
-
             sprite->setTexture(frames[currentFrame]);
             clock.restart();
         }
@@ -597,7 +562,6 @@ void GradiantBackground_Pause(sf::RenderWindow& window){
     gradient[2].position = {0.f, 800.f};
     gradient[3].position = {800.f, 800.f};
 
-    // ไล่สี บน → ล่าง
     gradient[0].color = sf::Color(80, 0, 150);
     gradient[1].color = sf::Color(40, 0, 70);
     gradient[2].color = sf::Color(10, 0, 20);
@@ -612,7 +576,6 @@ void GradiantBackground_Game24(sf::RenderWindow& window){
     gradient24[2].position = {0.f, 800.f};
     gradient24[3].position = {800.f, 800.f};
 
-    // ไล่สี บน → ล่าง
     gradient24[0].color = sf::Color(10,10,30);
     gradient24[1].color = sf::Color(10,10,30);
     gradient24[2].color = sf::Color(40,0,80);
@@ -620,7 +583,7 @@ void GradiantBackground_Game24(sf::RenderWindow& window){
     window.draw(gradient24);
 }
 
-void DrawKumWa_Time(sf::RenderWindow& window){ // คำว่า Time: เฉยๆ แยกออกจากกัน กูอยากเปลี่ยนสีเฉพาะตัวเลข
+void DrawKumWa_Time(sf::RenderWindow& window){
     sf::Text TimeText(font,"Time :",100);
     sf::FloatRect boundScreen = TimeText.getLocalBounds();
     TimeText.setOrigin({boundScreen.position.x+boundScreen.size.x/2,100-boundScreen.position.y});
@@ -633,13 +596,11 @@ void DrawKumWa_Time(sf::RenderWindow& window){ // คำว่า Time: เฉ�
 void DrawTronGrid(sf::RenderWindow& window, float offset)
 {
     int spacing = 40;
-    // เส้นแนวนอน 
     for(int y = -800; y < 800; y += spacing)
     {
         float pos = y + offset;
 
         sf::Vertex line[2];
-
         line[0].position = sf::Vector2f(0.f, pos);
         line[0].color = sf::Color(0,255,255,30);
 
